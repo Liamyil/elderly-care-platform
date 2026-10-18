@@ -1,0 +1,53 @@
+<view wx:if="{{show}}" class="login-mask" bindtap="onClose">
+  <view class="login-sheet" catchtap="preventClose">
+    <view class="sheet-close" bindtap="onClose">✕</view>
+
+    <!-- 主入口：两个登录方式 + 协议 -->
+    <block wx:if="{{mode === 'main'}}">
+      <view class="sheet-title">登录后解锁完整服务</view>
+      <view class="sheet-sub">游客可先浏览，操作时再登录</view>
+
+      <view class="btn-wechat" bindtap="onWechatLoginTap">
+        <text class="btn-wechat-icon">💬</text>
+        <text class="btn-wechat-text">微信快捷登录</text>
+      </view>
+
+      <view class="btn-phone" bindtap="onPhoneLoginTap">
+        <text class="btn-phone-text">短信登录（手机号）</text>
+      </view>
+
+      <view class="agreement-row" bindtap="onAgreeTap">
+        <view class="agree-check {{agreed ? 'on' : ''}}">
+          <text wx:if="{{agreed}}" class="agree-mark">✓</text>
+        </view>
+        <text class="agree-text">我已阅读并同意</text>
+        <text class="agree-link" catchtap="onShowAgreement" data-type="user">《用户协议》</text>
+        <text class="agree-text">与</text>
+        <text class="agree-link" catchtap="onShowAgreement" data-type="privacy">《隐私协议》</text>
+      </view>
+    </block>
+
+    <!-- 短信登录：只输手机号 -->
+    <block wx:if="{{mode === 'phone'}}">
+      <view class="sheet-back" bindtap="goMain">‹ 返回</view>
+      <view class="sheet-title">短信登录</view>
+      <view class="sheet-sub">输入手机号即可登录，未注册将自动创建账号</view>
+
+      <view class="input-box">
+        <input
+          class="sheet-input"
+          placeholder="请输入手机号"
+          value="{{phone}}"
+          bindinput="onPhoneInput"
+          type="number"
+          maxlength="11"
+        />
+      </view>
+
+      <view class="btn-wechat" bindtap="onPhoneSubmit">
+        <text class="btn-wechat-text">登录</text>
+      </view>
+    </block>
+
+  </view>
+</view>

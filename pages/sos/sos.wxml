@@ -1,0 +1,38 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">紧急求助</text>
+    <view class="nav-right"></view>
+  </view>
+  <view class="nav-content">
+    <view class="sos-section">
+      <view class="sos-btn {{isSOSSent ? 'sos-sent' : ''}}" bindtap="onSOSClick">
+        <text class="sos-text">SOS</text>
+      </view>
+      <text class="sos-hint" wx:if="{{!isSOSSent}}">点击按钮发起紧急求助</text>
+      <view class="sos-status" wx:if="{{isSOSSent}}">
+        <text class="status-icon">⚠️</text>
+        <text class="status-text">求助已发出，请保持电话畅通</text>
+      </view>
+    </view>
+
+    <view class="contacts-section">
+      <view class="section-title">紧急联系人</view>
+      <view class="contact-list">
+        <view class="contact-item" wx:for="{{contacts}}" wx:key="id">
+          <view class="contact-info">
+            <text class="contact-name">{{item.name}}</text>
+            <text class="contact-relation">{{item.relation}}</text>
+          </view>
+          <text class="contact-phone">{{item.phone}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="tips-section">
+      <text class="tips-text">仅限紧急情况使用，请勿随意测试</text>
+    </view>
+  </view>
+</view>

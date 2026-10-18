@@ -1,0 +1,275 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 32rpx;
+  padding-bottom: 20rpx;
+  z-index: 999;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 56rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.add-btn {
+  font-size: 30rpx;
+  color: #ffffff;
+  padding: 12rpx 24rpx;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 8rpx;
+}
+
+.nav-content {
+  padding-top: 160rpx;
+}
+
+.address-list {
+  padding: 24rpx;
+}
+
+.address-item {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+}
+
+.address-info {
+  margin-bottom: 20rpx;
+}
+
+.address-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.address-name {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.default-tag {
+  background-color: #EBF5F0;
+  padding: 6rpx 16rpx;
+  border-radius: 6rpx;
+  margin-left: 16rpx;
+}
+
+.default-text {
+  font-size: 22rpx;
+  color: #2D7D46;
+}
+
+.address-detail {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+.address-actions {
+  display: flex;
+  gap: 16rpx;
+  justify-content: flex-end;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #F5F5F5;
+}
+
+.default-btn {
+  padding: 12rpx 24rpx;
+  background-color: #EBF5F0;
+  border-radius: 8rpx;
+}
+
+.default-btn-text {
+  font-size: 26rpx;
+  color: #2D7D46;
+}
+
+.delete-btn {
+  padding: 12rpx 24rpx;
+  background-color: #FFEBEE;
+  border-radius: 8rpx;
+}
+
+.delete-text {
+  font-size: 26rpx;
+  color: #E53935;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 160rpx 0;
+}
+
+.empty-icon {
+  font-size: 100rpx;
+  margin-bottom: 32rpx;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #666666;
+  margin-bottom: 16rpx;
+}
+
+.empty-hint {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 640rpx;
+  background-color: #ffffff;
+  border-radius: 20rpx;
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.modal-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.modal-close {
+  width: 56rpx;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.close-icon {
+  font-size: 48rpx;
+  color: #999999;
+  line-height: 1;
+}
+
+.modal-body {
+  padding: 32rpx;
+}
+
+.form-item {
+  margin-bottom: 28rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #666666;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.form-input {
+  height: 96rpx;
+  font-size: 30rpx;
+  border: 2rpx solid #E0E0E0;
+  border-radius: 12rpx;
+  padding: 0 24rpx;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  height: 160rpx;
+  font-size: 30rpx;
+  border: 2rpx solid #E0E0E0;
+  border-radius: 12rpx;
+  padding: 20rpx 24rpx;
+  box-sizing: border-box;
+}
+
+.modal-footer {
+  display: flex;
+  border-top: 1rpx solid #F0F0F0;
+}
+
+.btn {
+  flex: 1;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: bold;
+  border: none;
+  border-radius: 0;
+}
+
+.btn-gray {
+  background-color: #F5F5F5;
+  color: #666666;
+}
+
+.btn-green {
+  background-color: #2D7D46;
+  color: #ffffff;
+}
+
+.btn-disabled {
+  opacity: 0.5;
+}

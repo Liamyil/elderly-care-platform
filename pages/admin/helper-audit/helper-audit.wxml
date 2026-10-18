@@ -1,0 +1,53 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">互助员申请审核</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 状态页签 -->
+    <scroll-view scroll-x class="tabs-scroll" show-scrollbar="false">
+      <view class="tabs">
+        <view
+          wx:for="{{statusTabs}}"
+          wx:key="key"
+          class="tab {{currentStatus === item.key ? 'on' : ''}}"
+          bindtap="onTabTap"
+          data-key="{{item.key}}"
+        >{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <!-- 申请列表 -->
+    <view wx:if="{{list.length}}" class="app-list">
+      <view class="app-card" wx:for="{{list}}" wx:key="id">
+        <view class="app-head">
+          <text class="app-name">{{item.realName}}</text>
+          <text class="app-status status-{{item.status}}">{{item.status === 'pending' ? '待审核' : (item.status === 'approved' ? '已通过' : '已驳回')}}</text>
+        </view>
+        <text class="app-line">账号：{{item.applicantName}}（{{item.phone}}）</text>
+        <text class="app-line">身份证：{{item.idCard}}</text>
+        <text class="app-line">服务意向：{{item.serviceTypes}}</text>
+        <text wx:if="{{item.area}}" class="app-line">常住区域：{{item.area}}</text>
+        <text wx:if="{{item.experience}}" class="app-line">相关经验：{{item.experience}}</text>
+        <text wx:if="{{item.intro}}" class="app-line">简介：{{item.intro}}</text>
+        <text class="app-line">承诺书：{{item.pledgeVersion}} 版，{{item.pledgeAgreedAt}} 签署</text>
+        <text class="app-line">申请时间：{{item.createdAtText}}</text>
+        <text wx:if="{{item.status === 'rejected' && item.rejectReason}}" class="app-line reject-line">驳回原因：{{item.rejectReason}}</text>
+
+        <view wx:if="{{item.status === 'pending'}}" class="app-actions">
+          <view class="btn btn-green" bindtap="onApprove" data-id="{{item.id}}" data-name="{{item.realName}}">通过</view>
+          <view class="btn btn-orange" bindtap="onReject" data-id="{{item.id}}">驳回</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-state">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无相关申请</text>
+    </view>
+  </view>
+</view>

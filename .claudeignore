@@ -1,0 +1,11 @@
+node_modules/
+dist/
+target/
+build/
+*.log
+*.jpg
+*.png
+*.jpeg
+*.gif
+*.ico
+.git/

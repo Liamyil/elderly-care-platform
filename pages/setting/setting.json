@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "设置",
+  "usingComponents": {
+    "login-popup": "/components/login-popup/login-popup"
+  }
+}

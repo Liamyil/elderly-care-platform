@@ -1,0 +1,115 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 80rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-content {
+  padding-top: 180rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+/* 互助员卡片 */
+.helper-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.helper-avatar {
+  width: 110rpx;
+  height: 110rpx;
+  border-radius: 50%;
+  background-color: #F2F8F4;
+  font-size: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.helper-info {
+  flex: 1;
+}
+
+.helper-name-row {
+  display: flex;
+  align-items: center;
+}
+
+.helper-name {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+  margin-right: 16rpx;
+}
+
+.helper-badge {
+  font-size: 20rpx;
+  color: #2D7D46;
+  background-color: #EBF5F0;
+  border-radius: 6rpx;
+  padding: 4rpx 12rpx;
+}
+
+.helper-stars {
+  font-size: 24rpx;
+  margin-top: 8rpx;
+  color: #F5A623;
+}
+
+.helper-desc {
+  font-size: 24rpx;
+  color: #888888;
+  margin-top: 6rpx;
+}
+
+/* 底部说明 */
+.helper-note {
+  font-size: 24rpx;
+  color: #999999;
+  text-align: center;
+  padding: 20rpx 40rpx 40rpx;
+  line-height: 1.6;
+}

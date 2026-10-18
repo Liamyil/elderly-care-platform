@@ -1,0 +1,195 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 80rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-content {
+  padding-top: 180rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+/* 头部卡片 */
+.head-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 40rpx 32rpx;
+  display: flex;
+  align-items: center;
+}
+
+.head-avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  background-color: #F2F8F4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 28rpx;
+  flex-shrink: 0;
+}
+
+.head-avatar-icon {
+  font-size: 72rpx;
+}
+
+.head-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.head-name {
+  display: block;
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.head-meta {
+  display: block;
+  font-size: 26rpx;
+  color: #666666;
+  margin-top: 8rpx;
+}
+
+.head-stars {
+  margin-top: 10rpx;
+}
+
+.head-star-text {
+  font-size: 26rpx;
+  color: #F5A623;
+}
+
+.head-count {
+  display: block;
+  font-size: 26rpx;
+  color: #2D7D46;
+  font-weight: bold;
+  margin-top: 8rpx;
+}
+
+/* 区块 */
+.section {
+  margin-top: 24rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.section-sub {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.bio-text {
+  font-size: 28rpx;
+  color: #444444;
+  line-height: 1.6;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.tag-item {
+  font-size: 24rpx;
+  color: #2BC0E4;
+  border: 2rpx solid #2BC0E4;
+  border-radius: 6rpx;
+  padding: 4rpx 12rpx;
+}
+
+/* 评价列表 */
+.review-item {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.review-item:last-child {
+  border-bottom: none;
+}
+
+.review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.review-stars {
+  font-size: 24rpx;
+}
+
+.review-time {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+.review-comment {
+  display: block;
+  font-size: 26rpx;
+  color: #555555;
+  margin-top: 10rpx;
+  line-height: 1.5;
+}
+
+.empty-text {
+  font-size: 26rpx;
+  color: #999999;
+  text-align: center;
+  padding: 20rpx 0;
+}

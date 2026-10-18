@@ -1,0 +1,36 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">医院信息</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 城市切换 -->
+    <scroll-view scroll-x class="city-tabs" show-scrollbar="false">
+      <view
+        class="city-tab {{item === currentCity ? 'city-tab-active' : ''}}"
+        wx:for="{{cities}}"
+        wx:key="*this"
+        bindtap="onCityTap"
+        data-city="{{item}}"
+      >{{item}}</view>
+    </scroll-view>
+
+    <!-- 医院列表 -->
+    <view class="hospital-card" wx:for="{{hospitals}}" wx:key="name">
+      <view class="hospital-head">
+        <text class="hospital-name">{{item.name}}</text>
+        <text class="hospital-level {{item.levelClass}}">{{item.level}}</text>
+      </view>
+      <view class="hospital-addr">📍 {{item.addr}}</view>
+    </view>
+
+    <!-- 说明 -->
+    <view class="hospital-note">
+      以上为参考合作医院，更多医院正在接入中。下单时可自行填写其他医院名称。
+    </view>
+  </view>
+</view>

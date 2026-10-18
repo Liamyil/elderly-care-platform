@@ -1,0 +1,46 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">服务兑换</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="balance-card">
+      <text class="balance-label">当前时间币余额</text>
+      <view class="balance-value">
+        <text class="balance-num">{{timeCoins}}</text>
+        <text class="balance-unit">时间币</text>
+      </view>
+    </view>
+
+    <view class="section-header">
+      <text class="section-title">可兑换服务</text>
+    </view>
+
+    <view class="service-list">
+      <view 
+        wx:for="{{services}}" 
+        wx:key="id" 
+        class="service-item"
+      >
+        <view class="service-info">
+          <text class="service-name">{{item.name}}</text>
+          <text class="service-desc">{{item.description}}</text>
+        </view>
+        <view class="service-action">
+          <text class="service-price">🪙 {{item.coins}}时间币</text>
+          <view 
+            class="exchange-btn {{item.exchanged ? 'exchanged' : ''}}" 
+            bindtap="onExchange" 
+            data-id="{{item.id}}"
+          >
+            <text class="exchange-text">{{item.exchanged ? '已兑换' : '兑换'}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

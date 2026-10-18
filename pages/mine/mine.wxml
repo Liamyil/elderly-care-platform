@@ -1,0 +1,127 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">我的</text>
+  </view>
+  <view class="nav-content">
+    <view class="profile-section">
+      <view class="profile-info" bindtap="onProfileClick">
+        <view class="avatar-wrapper">
+          <image class="avatar" src="{{userInfo.avatar || '/images/我的页面/mi.png'}}" mode="aspectFill" />
+        </view>
+        <view class="user-info">
+          <text class="user-name">{{userInfo.name}}</text>
+          <text class="user-id">{{userInfo.id}}</text>
+          <text wx:if="{{isLoggedIn}}" class="user-detail">手机号：{{userInfo.phone}} | {{userInfo.role}}</text>
+        </view>
+      </view>
+      <view class="settings-btn" bindtap="goToSettings">
+        <image class="settings-icon" src="/images/我的页面/sz.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <!-- 互助员申请进度通知卡片：审核中（浅橙）/被驳回（浅红）/已通过未切换（浅绿），无申请或已切换时隐藏 -->
+    <view wx:if="{{noticeCard.show}}" class="notice-card {{noticeCard.theme}}" bindtap="onHelperNoticeTap">
+      <text class="notice-icon">{{noticeCard.icon}}</text>
+      <view class="notice-body">
+        <text class="notice-title">{{noticeCard.title}}</text>
+        <text class="notice-sub">{{noticeCard.sub}}</text>
+        <text wx:if="{{applyTimeText}}" class="notice-time">申请时间：{{applyTimeText}}</text>
+      </view>
+      <text class="notice-arrow">›</text>
+    </view>
+
+  <view class="stats-card">
+    <view class="stat-item">
+      <text class="stat-value">{{userInfo.timeCoins}}</text>
+      <text class="stat-label">累计获得时间币</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{userInfo.serviceCount}}</text>
+      <text class="stat-label">已完成订单</text>
+    </view>
+    <view class="stat-divider"></view>
+    <view class="stat-item">
+      <text class="stat-value">{{userInfo.evaluationScore}}</text>
+      <text class="stat-label">服务评价</text>
+    </view>
+  </view>
+
+  <!-- 模式切换卡片（双重身份共存）：统计卡与功能列表之间，拥有互助员身份才显示 -->
+  <view wx:if="{{userInfo.isHelper}}" class="mode-switch-card" bindtap="onSwitchToHelper">
+    <text class="mode-switch-icon">🔄</text>
+    <text class="mode-switch-text">当前模式：发单模式（点击切换至接单端）</text>
+    <text class="mode-switch-arrow">></text>
+  </view>
+
+  <view class="menu-list">
+    <view class="menu-item" bindtap="goToAccount">
+      <text class="menu-icon">🔐</text>
+      <text class="menu-name">账号与安全</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view wx:if="{{helperApplyStatus !== 'helper'}}" class="menu-item" bindtap="onHelperApplyMenuTap">
+      <text class="menu-icon">🤝</text>
+      <text class="menu-name">申请成为互助员</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToOrderList">
+      <text class="menu-icon">📋</text>
+      <text class="menu-name">我的订单</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToBank">
+      <text class="menu-icon">🏦</text>
+      <text class="menu-name">时间银行</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToHealth">
+      <text class="menu-icon">❤️</text>
+      <text class="menu-name">健康档案</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToHelpers">
+      <text class="menu-icon">👥</text>
+      <text class="menu-name">我的互助员</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToEvaluation">
+      <text class="menu-icon">⭐</text>
+      <text class="menu-name">服务评价</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToAbout">
+      <text class="menu-icon">ℹ️</text>
+      <text class="menu-name">关于平台</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <view class="logout-section">
+    <view class="logout-btn" bindtap="onLogout">
+      <text class="logout-text">退出登录</text>
+    </view>
+  </view>
+  </view>
+  <!-- 互助员服务承诺书全屏阅读弹窗（倒计时 5s 后可同意） -->
+  <view wx:if="{{showPledge}}" class="pledge-mask">
+    <view class="pledge-panel">
+      <view class="pledge-header">
+        <text class="pledge-title">互助员服务承诺书</text>
+        <view class="pledge-close" bindtap="onPledgeClose">×</view>
+      </view>
+      <scroll-view scroll-y class="pledge-body">
+        <text class="pledge-text">（承诺书全文待定稿，业务文字确认后替换）
+
+此处将展示互助员服务承诺书的完整内容，包括服务规范、诚信要求、隐私保护与监督管理等条款。</text>
+      </scroll-view>
+      <view class="pledge-footer">
+        <view class="pledge-agree-btn {{pledgeReady ? 'ready' : ''}}" bindtap="onPledgeAgree">
+          {{pledgeReady ? '同意并承诺' : '请仔细阅读（' + pledgeCountdown + 's）'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "陪诊预约",
+  "usingComponents": {
+    "select-panel": "/components/select-panel/select-panel",
+    "login-popup": "/components/login-popup/login-popup"
+  }
+}

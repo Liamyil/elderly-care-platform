@@ -1,0 +1,30 @@
+<view wx:if="{{show}}" class="panel-mask" bindtap="onCancel">
+  <view class="panel-body" catchtap="preventClose">
+    <view class="panel-header">
+      <text class="panel-cancel" bindtap="onCancel">取消</text>
+      <text class="panel-title">{{title}}</text>
+      <text class="panel-confirm" wx:if="{{mode === 'date'}}" bindtap="onConfirm">确定</text>
+    </view>
+
+    <!-- 列表模式 -->
+    <scroll-view wx:if="{{mode === 'list'}}" scroll-y class="panel-list">
+      <view class="panel-option {{item === value ? 'panel-option-active' : ''}}" wx:for="{{options}}" wx:key="*this" bindtap="onOptionTap" data-index="{{index}}">
+        <text class="panel-option-text">{{item}}</text>
+        <text wx:if="{{item === value}}" class="panel-option-check">✓</text>
+      </view>
+    </scroll-view>
+
+    <!-- 日期模式 -->
+    <picker-view wx:else class="panel-date" value="{{dateValue}}" bindchange="onDateChange">
+      <picker-view-column>
+        <view class="panel-date-item" wx:for="{{years}}" wx:key="*this">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view class="panel-date-item" wx:for="{{months}}" wx:key="*this">{{item}}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view class="panel-date-item" wx:for="{{days}}" wx:key="*this">{{item}}</view>
+      </picker-view-column>
+    </picker-view>
+  </view>
+</view>

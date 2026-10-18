@@ -1,0 +1,56 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">互助员详情</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 头部卡片：头像 + 基本信息 -->
+    <view class="head-card">
+      <!-- 头像：profile.avatar 有值后换为 <image src="{{profile.avatar}}" class="head-avatar" mode="aspectFill" /> -->
+      <view class="head-avatar">
+        <text class="head-avatar-icon">🧑</text>
+      </view>
+      <view class="head-info">
+        <text class="head-name">{{name}}</text>
+        <text wx:if="{{profile.gender || profile.age}}" class="head-meta">{{profile.gender}}<block wx:if="{{profile.gender && profile.age}}"> · </block>{{profile.age}}</text>
+        <view class="head-stars">
+          <text class="head-star-text">{{avgStarText}}</text>
+        </view>
+        <text class="head-count">已完成 {{serviceCount}} 单服务</text>
+      </view>
+    </view>
+
+    <!-- 基本信息 -->
+    <view class="section" wx:if="{{profile.bio || profile.tags.length}}">
+      <view class="section-header">
+        <text class="section-title">基本信息</text>
+      </view>
+      <text wx:if="{{profile.bio}}" class="bio-text">{{profile.bio}}</text>
+      <view wx:if="{{profile.tags.length}}" class="tag-row">
+        <text class="tag-item" wx:for="{{profile.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+      </view>
+    </view>
+
+    <!-- 服务评价 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">服务评价</text>
+        <text class="section-sub" wx:if="{{reviews.length}}">共 {{reviews.length}} 条</text>
+      </view>
+      <view wx:if="{{reviews.length}}">
+        <view class="review-item" wx:for="{{reviews}}" wx:key="index">
+          <view class="review-head">
+            <text class="review-stars">{{item.starText}}</text>
+            <text class="review-time">{{item.time}}</text>
+          </view>
+          <text class="review-comment">{{item.comment}}</text>
+        </view>
+      </view>
+      <view wx:else class="empty-text">暂无评价</view>
+    </view>
+  </view>
+</view>

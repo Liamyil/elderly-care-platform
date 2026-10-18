@@ -1,0 +1,84 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">时间银行</text>
+  </view>
+  <view class="nav-content">
+    <view class="overview-card">
+    <view class="balance-section">
+      <text class="balance-label">当前时间币余额</text>
+      <view class="balance-value">
+        <text class="balance-num">{{balance}}</text>
+        <text class="balance-unit">时间币</text>
+      </view>
+    </view>
+    <view class="stats-row">
+      <view class="stat-item">
+        <text class="stat-value">{{totalEarned}}</text>
+        <text class="stat-label">累计赚取</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value">{{totalRedeemed}}</text>
+        <text class="stat-label">已兑换</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="function-grid">
+    <view class="function-item" bindtap="onServiceExchange">
+      <view class="function-icon-wrapper">
+        <image wx:if="{{iconExists.service}}" class="function-icon" src="/images/service.png" mode="aspectFit" />
+        <text wx:else class="function-emoji">🛒</text>
+      </view>
+      <text class="function-text">服务兑换</text>
+    </view>
+    <view class="function-item" bindtap="onGiftExchange">
+      <view class="function-icon-wrapper">
+        <image wx:if="{{iconExists.gift}}" class="function-icon" src="/images/gift.png" mode="aspectFit" />
+        <text wx:else class="function-emoji">🎁</text>
+      </view>
+      <text class="function-text">实物兑换</text>
+    </view>
+    <view class="function-item" bindtap="onTransfer">
+      <view class="function-icon-wrapper">
+        <image wx:if="{{iconExists.transfer}}" class="function-icon" src="/images/transfer.png" mode="aspectFit" />
+        <text wx:else class="function-emoji">💝</text>
+      </view>
+      <text class="function-text">转赠</text>
+    </view>
+    <view class="function-item" bindtap="onBill">
+      <view class="function-icon-wrapper">
+        <image wx:if="{{iconExists.bill}}" class="function-icon" src="/images/bill.png" mode="aspectFit" />
+        <text wx:else class="function-emoji">📋</text>
+      </view>
+      <text class="function-text">明细账单</text>
+    </view>
+  </view>
+
+  <view class="recent-section">
+    <view class="section-header">
+      <text class="section-title">最近交易</text>
+      <text class="section-more" bindtap="onViewAll">查看全部 ></text>
+    </view>
+    <view class="transaction-list">
+      <view 
+        wx:for="{{recentTransactions}}" 
+        wx:key="id"
+        class="transaction-item"
+        bindtap="onTransactionClick"
+        data-transaction="{{item}}"
+      >
+        <view class="transaction-icon {{item.type}}">
+          <text class="icon-text">{{item.type === 'income' ? '+' : '-'}}</text>
+        </view>
+        <view class="transaction-info">
+          <text class="transaction-name">{{item.name}}</text>
+          <text class="transaction-time">{{item.time}}</text>
+        </view>
+        <text class="transaction-amount {{item.type}}">{{item.type === 'income' ? '+' : ''}}{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+  </view>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

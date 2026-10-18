@@ -1,0 +1,214 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">互助养老 - 首页</text>
+  </view>
+  <view class="nav-content">
+    <view class="header">
+      <view class="location" bindtap="onLocationClick">
+        <image class="location-icon" src="/images/tab/location.png" mode="aspectFit" />
+        <text class="location-text">{{city}}·{{district}}</text>
+        <text class="location-arrow">›</text>
+      </view>
+      <view class="message" bindtap="goToNotice">
+        <image class="message-icon" src="/images/tab/notification.png" mode="aspectFit" />
+        <view wx:if="{{hasUnreadMessages}}" class="message-dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showCityPicker}}" class="city-picker-overlay" bindtap="onCloseCityPicker">
+    <view class="city-picker-content" catchtap="preventClose">
+      <view class="city-picker-header">
+        <text class="city-picker-title">选择城市和区域</text>
+        <view class="city-picker-close" bindtap="onCloseCityPicker">
+          <text class="close-text">✕</text>
+        </view>
+      </view>
+      <view class="city-picker-body">
+        <picker-view class="city-picker-view" value="{{pickerValue}}" bindchange="onPickerChange">
+          <picker-view-column class="picker-column">
+            <view wx:for="{{cityNames}}" wx:key="*this" class="picker-item">
+              {{item}}
+            </view>
+          </picker-view-column>
+          <picker-view-column class="picker-column">
+            <view wx:for="{{currentDistricts}}" wx:key="*this" class="picker-item">
+              {{item}}
+            </view>
+          </picker-view-column>
+        </picker-view>
+      </view>
+      <view class="city-picker-footer">
+        <view class="city-picker-cancel" bindtap="onCloseCityPicker">取消</view>
+        <view class="city-picker-confirm" bindtap="onConfirmCity">确定</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="search-bar">
+    <view class="search-input-wrapper">
+      <image class="search-icon" src="/images/tab/search.png" mode="aspectFit" />
+      <input class="search-input" placeholder="搜索服务、互助员..." placeholder-class="search-placeholder" bindinput="onSearchInput" bindconfirm="onSearchConfirm" />
+    </view>
+    <view class="scan-btn" bindtap="scanCode">
+      <image class="scan-icon" src="/images/tab/scan.png" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view class="banner-section">
+    <swiper class="banner-swiper" autoplay="true" interval="3000" indicator-dots="true" indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#ffffff" circular="true">
+      <swiper-item>
+        <image class="banner-image" src="/images/Banner轮播图/专业陪诊，温暖同行.jpg" mode="aspectFill" />
+      </swiper-item>
+      <swiper-item>
+        <image class="banner-image" src="/images/Banner轮播图/温暖上门服务，关怀到家.jpg" mode="aspectFill" />
+      </swiper-item>
+      <swiper-item>
+        <image class="banner-image" src="/images/Banner轮播图/陪伴关怀，温暖守护.jpg" mode="aspectFill" />
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 陪诊服务入口（方案一：白卡样式） -->
+  <view class="pz-entry" bindtap="goPeizhen">
+    <view class="pz-entry-left">
+      <text class="pz-entry-icon">🏥</text>
+      <view>
+        <view class="pz-entry-name">陪诊服务</view>
+        <view class="pz-entry-desc">挂号取药 · 陪同就诊</view>
+      </view>
+    </view>
+    <view class="pz-entry-btn" catchtap="goPeizhenBook">立即预约</view>
+  </view>
+
+  <view class="quick-entrance">
+    <view class="entrance-row">
+      <view class="entrance-item" bindtap="handleEntranceClick" data-type="order">
+        <view class="entrance-icon-wrapper">
+          <image class="entrance-icon" src="/images/file-add.png" mode="aspectFit" />
+        </view>
+        <text class="entrance-text">自主下单</text>
+      </view>
+      <view class="entrance-item sos-item" bindtap="handleSOSClick">
+        <view class="entrance-icon-wrapper entrance-sos">
+          <text class="entrance-icon-text">SOS</text>
+        </view>
+        <text class="entrance-text">紧急SOS</text>
+      </view>
+      <view class="entrance-item" bindtap="handleEntranceClick" data-type="bank">
+        <view class="entrance-icon-wrapper">
+          <image class="entrance-icon" src="/images/wallet.png" mode="aspectFit" />
+        </view>
+        <text class="entrance-text">时间银行</text>
+      </view>
+      <view class="entrance-item" bindtap="handleEntranceClick" data-type="health">
+        <view class="entrance-icon-wrapper">
+          <image class="entrance-icon" src="/images/health.png" mode="aspectFit" />
+        </view>
+        <text class="entrance-text">健康管理</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="notice-section">
+    <view class="notice-header">
+      <view class="notice-title">
+        <image class="notice-icon" src="/images/tab/bullhorn.png" mode="aspectFit" />
+        <text class="notice-text">平台公告</text>
+      </view>
+      <view class="notice-more" bindtap="goToNotice">
+        <text>更多</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+    <swiper class="notice-swiper" vertical="true" autoplay="true" interval="4000" circular="true">
+      <swiper-item wx:for="{{notices}}" wx:key="id">
+        <view class="notice-item" bindtap="goToNoticeDetail">
+          <text class="notice-content">{{item.content}}</text>
+        </view>
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <view class="order-section" wx:if="{{false}}">
+    <view class="order-header">
+      <view class="order-title">
+        <image class="order-title-icon" src="/images/tab/hospital.png" mode="aspectFit" />
+        <text>附近互助订单</text>
+      </view>
+    </view>
+    <view class="nearby-order-list">
+      <view class="nearby-order-card" wx:for="{{orders}}" wx:key="id">
+        <view class="nearby-card-header">
+          <view class="nearby-type-row">
+            <text class="nearby-order-type">{{item.type}}</text>
+            <text class="nearby-order-distance">{{item.distance}}</text>
+          </view>
+          <text class="nearby-order-reward">{{item.priceText ? ('¥' + item.priceText) : ('🪙 ' + item.reward + '时间币')}}</text>
+        </view>
+
+        <view class="nearby-card-body">
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">发布用户：</text>
+            <text class="nearby-info-value">{{item.userNickname}}</text>
+          </view>
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">服务地址：</text>
+            <text class="nearby-info-value">{{item.address}}</text>
+          </view>
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">预约时间：</text>
+            <text class="nearby-info-value">{{item.time}}</text>
+          </view>
+          <view wx:if="{{item.remark}}" class="nearby-info-row">
+            <text class="nearby-info-label">需求描述：</text>
+            <text class="nearby-info-value">{{item.remark}}</text>
+          </view>
+          <view wx:if="{{item.images && item.images.length > 0}}" class="nearby-info-row">
+            <text class="nearby-info-label">现场图片：</text>
+            <text class="nearby-view-images" catchtap="onViewImages" data-order-id="{{item.id}}">点击查看图片</text>
+          </view>
+          <view class="nearby-publish-row">
+            <text class="nearby-publish-label">发布时间：</text>
+            <text class="nearby-publish-time">{{item.publishTime}}</text>
+          </view>
+        </view>
+
+        <view class="nearby-card-footer">
+          <button class="btn-accept" catchtap="grabOrder" data-order-id="{{item.id}}">立即接单</button>
+        </view>
+      </view>
+
+      <view wx:if="{{orders.length === 0}}" class="nearby-empty">
+        <text class="nearby-empty-icon">📋</text>
+        <text class="nearby-empty-text">暂无附近订单</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showImageModal}}" class="modal-overlay image-modal-overlay" bindtap="onCloseImageModal">
+    <view class="image-modal-content" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">订单现场图片</text>
+        <view class="modal-close" bindtap="onCloseImageModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      <scroll-view scroll-x class="image-scroll" show-scrollbar="false">
+        <view class="image-preview-list">
+          <view wx:for="{{previewImages}}" wx:key="index" class="preview-item">
+            <image 
+              src="{{item}}" 
+              mode="aspectFill"
+              class="preview-image"
+              bindtap="onPreviewImage"
+              data-index="{{index}}"
+            />
+          </view>
+        </view>
+      </scroll-view>
+      <view class="image-tip">点击图片可放大查看</view>
+    </view>
+  </view>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

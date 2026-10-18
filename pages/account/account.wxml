@@ -1,0 +1,90 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">账号与安全</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 基本信息 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">基本信息</text>
+      </view>
+      <!-- 左半 50%：头像位置（圆角正方形虚线框）；右半 50%：昵称/手机号 -->
+      <view class="profile-row">
+        <view class="avatar-half">
+          <!-- 虚线框画在固定 1:1 的 view 容器上；图片绝对定位平铺框内（等比例居中完整显示）；button 透明覆盖只负责点击选择 -->
+          <view class="avatar-frame">
+            <image wx:if="{{avatarUrl}}" class="avatar-img" src="{{avatarUrl}}" mode="aspectFit" />
+            <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+              <text wx:if="{{!avatarUrl}}" class="avatar-placeholder">＋</text>
+            </button>
+          </view>
+        </view>
+        <view class="info-half">
+          <view class="info-row">
+            <text class="info-label">昵称</text>
+            <input
+              class="info-input"
+              type="nickname"
+              placeholder="请输入昵称"
+              value="{{nameInput}}"
+              bindinput="onNameInput"
+            />
+          </view>
+          <view class="info-row">
+            <text class="info-label">手机号</text>
+            <text class="info-value">{{user.phone || '未绑定'}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="save-btn" bindtap="onSaveName">
+        <text class="save-text">修改</text>
+      </view>
+      <text class="section-hint">手机号为平台唯一主账号，如需更换请联系平台管理员</text>
+    </view>
+
+    <!-- 补绑手机号（微信直接登录的账号） -->
+    <view wx:if="{{user && !user.phone}}" class="section">
+      <view class="section-header">
+        <text class="section-title">绑定手机号</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">手机号</text>
+        <input
+          class="info-input"
+          placeholder="请输入手机号"
+          type="number"
+          maxlength="11"
+          value="{{phoneInput}}"
+          bindinput="onPhoneInput"
+        />
+      </view>
+      <view class="save-btn" style="margin-top: 20rpx;" bindtap="onBindPhone">
+        <text class="save-text">立即绑定</text>
+      </view>
+      <text class="section-hint">手机号为平台唯一主账号，一个手机号仅绑定一个微信</text>
+    </view>
+
+    <!-- 微信绑定 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">微信绑定</text>
+      </view>
+      <view wx:if="{{user.wechatBound}}" class="bind-done">
+        <text class="bind-done-text">✅ 已绑定微信（可用微信一键登录，接收服务提醒）</text>
+      </view>
+      <view wx:else class="bind-todo">
+        <text class="bind-todo-text">未绑定微信：绑定后可用微信一键登录，并接收订单推送提醒</text>
+        <view class="bind-btn" bindtap="onBindWechat">
+          <text class="bind-btn-text">立即绑定微信</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

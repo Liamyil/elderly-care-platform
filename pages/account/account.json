@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "账号与安全",
+  "usingComponents": {
+    "login-popup": "/components/login-popup/login-popup"
+  }
+}

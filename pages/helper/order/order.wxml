@@ -1,0 +1,172 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">我的订单</text>
+  </view>
+
+  <view class="nav-content">
+    <view class="status-tabs">
+      <view 
+        wx:for="{{statusTabs}}" 
+        wx:key="key"
+        class="status-tab {{currentStatus === item.key ? 'active' : ''}}"
+        bindtap="onStatusTabClick"
+        data-status="{{item.key}}"
+        data-index="{{index}}"
+      >
+        <text class="tab-text">{{item.label}}</text>
+        <text class="tab-badge">{{tabCounts[index]}}</text>
+      </view>
+    </view>
+
+    <swiper 
+      class="order-swiper" 
+      current="{{currentIndex}}" 
+      bindchange="onSwiperChange"
+      duration="300"
+    >
+      <swiper-item wx:for="{{statusTabs}}" wx:key="key" class="swiper-item">
+        <scroll-view scroll-y class="order-list" show-scrollbar="{{false}}">
+          <view 
+            wx:for="{{orders[item.key]}}" 
+            wx:for-item="order"
+            wx:key="id"
+            class="order-card"
+          >
+            <view class="order-header">
+              <text class="order-no">订单号：{{order.id}}</text>
+              <text class="order-status {{order.statusKey}}">{{order.statusKey === 'pending_confirm' ? '服务完成·待确认' : order.status}}</text>
+            </view>
+
+            <view class="order-body">
+              <view class="order-info-row">
+                <text class="order-type">{{order.type}}</text>
+                <text class="order-reward">{{order.priceText ? ('¥' + order.priceText) : ('🪙 ' + order.reward + '时间币')}}</text>
+              </view>
+
+              <view class="order-address-row">
+                <text class="address-label">地址：</text>
+                <text class="order-address">{{order.address}}</text>
+              </view>
+
+              <view class="order-time-row">
+                <text class="time-label">预约时间：</text>
+                <text class="order-time">{{order.time}}</text>
+              </view>
+
+              <view wx:if="{{order.remark}}" class="order-remark-row">
+                <text class="remark-label">需求描述：</text>
+                <text class="order-remark">{{order.remark}}</text>
+              </view>
+
+              <view wx:if="{{order.images}}" class="order-images-row">
+                <text class="images-label">现场图片：</text>
+                <text class="view-images-link" catchtap="onViewImages" data-order-id="{{order.id}}">点击查看图片</text>
+              </view>
+
+              <view wx:if="{{order.statusKey === 'cancelled' && order.cancelReason}}" class="cancel-reason-row">
+                <text class="cancel-reason-label">取消原因：</text>
+                <text class="cancel-reason-text">{{order.cancelReason}}</text>
+              </view>
+            </view>
+
+            <!-- 服务留痕打卡（服务中订单） -->
+            <view wx:if="{{order.statusKey === 'serving'}}" class="trace-bar">
+              <view
+                class="trace-item {{order.traceSummary.hasStart ? 'done' : ''}}"
+                catchtap="onGoTrace"
+                data-id="{{order.id}}"
+                data-kind="start"
+              >
+                <text class="trace-icon">📍</text>
+                <text class="trace-name">开工打卡</text>
+                <text class="trace-state">{{order.traceSummary.hasStart ? '已完成 ✓' : '去打卡 ›'}}</text>
+              </view>
+              <view
+                class="trace-item {{order.traceSummary.hasEnd ? 'done' : ''}}"
+                catchtap="onGoTrace"
+                data-id="{{order.id}}"
+                data-kind="end"
+              >
+                <text class="trace-icon">📸</text>
+                <text class="trace-name">完工打卡</text>
+                <text class="trace-state">{{order.traceSummary.hasEnd ? '已完成 ✓' : '去打卡 ›'}}</text>
+              </view>
+            </view>
+
+            <view class="order-footer">
+              <block wx:if="{{order.statusKey === 'serving'}}">
+                <view class="order-footer-info">
+                  <text class="helper-info">我已接单</text>
+                </view>
+                <button class="btn btn-gray" catchtap="onContactHelper" data-id="{{order.id}}">联系TA</button>
+                <button class="btn btn-green" catchtap="onCompleteService" data-id="{{order.id}}">服务完成</button>
+              </block>
+
+              <block wx:if="{{order.statusKey === 'pending_confirm'}}">
+                <view class="order-footer-info">
+                  <text class="helper-info">已完成服务，等待对方确认</text>
+                </view>
+                <button class="btn btn-disabled" disabled>等待确认中...</button>
+              </block>
+
+              <block wx:if="{{order.statusKey === 'completed'}}">
+                <text class="completed-text">已完成</text>
+                <text wx:if="{{!order.evaluated}}" class="waiting-text">等待评价</text>
+                <text wx:else class="evaluated-text">已评价</text>
+              </block>
+
+              <block wx:if="{{order.statusKey === 'cancelled'}}">
+                <view class="cancelled-row">
+                  <view class="cancelled-times">
+                    <view wx:if="{{order.publishTime}}" class="time-item">
+                      <text class="time-item-label">发布：</text>
+                      <text class="time-item-value">{{order.publishTime}}</text>
+                    </view>
+                    <view wx:if="{{order.cancelTime}}" class="time-item">
+                      <text class="time-item-label">取消：</text>
+                      <text class="time-item-value">{{order.cancelTime}}</text>
+                    </view>
+                  </view>
+                </view>
+              </block>
+            </view>
+          </view>
+
+          <view wx:if="{{!orders[item.key] || orders[item.key].length === 0}}" class="empty-state">
+            <text class="empty-icon">📋</text>
+            <text class="empty-text">暂无{{item.label}}订单</text>
+          </view>
+        </scroll-view>
+      </swiper-item>
+    </swiper>
+
+    <view wx:if="{{showImageModal}}" class="modal-overlay image-modal-overlay" bindtap="onCloseImageModal">
+      <view class="image-modal-content" catchtap="preventClose">
+        <view class="modal-header">
+          <text class="modal-title">订单现场图片</text>
+          <view class="modal-close" bindtap="onCloseImageModal">
+            <text class="close-icon">×</text>
+          </view>
+        </view>
+        <scroll-view scroll-x class="image-scroll" show-scrollbar="false">
+          <view class="image-preview-list">
+            <view wx:for="{{previewImages}}" wx:key="index" class="preview-item">
+              <image 
+                src="{{item}}" 
+                mode="aspectFill"
+                class="preview-image"
+                bindtap="onPreviewImage"
+                binderror="onImageError"
+                data-index="{{index}}"
+              />
+            </view>
+          </view>
+        </scroll-view>
+        <view class="image-tip">点击图片可放大查看</view>
+      </view>
+    </view>
+  </view>
+
+  <nav-bar selected="1"></nav-bar>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

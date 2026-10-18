@@ -1,0 +1,81 @@
+<view class="page-container">
+  <!-- 顶部导航 -->
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">服务选择</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <!-- 次级头部：服务站 + 地区下拉 -->
+  <view class="sub-header" bindtap="onSubHeaderTap">
+    <text class="sub-header-text">稳稳陪{{currentCity}}服务站</text>
+    <text class="sub-header-arrow">▾</text>
+  </view>
+
+  <!-- 自绘地区下拉面板（大字号选项） -->
+  <view wx:if="{{showCityPicker}}" class="city-mask" bindtap="onSubHeaderTap">
+    <view class="city-panel" style="margin-top: calc({{statusBarHeight}}px + 176rpx)" catchtap="preventClose">
+      <view class="city-item" wx:for="{{cities}}" wx:key="*this" bindtap="onCitySelect" data-city="{{item}}">
+        <text class="city-item-text">{{item}}</text>
+        <text wx:if="{{item === currentCity}}" class="city-item-check">✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 主体：左分类 + 右列表 -->
+  <view class="body">
+    <!-- 左侧分类栏 -->
+    <view class="sidebar">
+      <view
+        class="side-item {{item === currentCategory ? 'side-item-active' : ''}}"
+        wx:for="{{categories}}"
+        wx:key="*this"
+        bindtap="onCategoryTap"
+        data-category="{{item}}"
+      >
+        <text>{{item}}</text>
+      </view>
+    </view>
+
+    <!-- 右侧列表 -->
+    <view class="right">
+      <view class="right-title">{{currentCategory}}</view>
+      <scroll-view scroll-y class="right-scroll">
+        <view class="item-card" wx:for="{{items}}" wx:key="name" bindtap="onItemTap" data-name="{{item.name}}">
+          <!-- 商品图：item.image 有值时显示设计图，否则 emoji 占位 -->
+          <view class="item-img">
+            <image wx:if="{{item.image}}" src="{{item.image}}" class="item-img-image" mode="aspectFill" />
+            <text wx:else class="item-img-icon">{{item.icon}}</text>
+            <text wx:if="{{item.badge}}" class="item-img-badge">{{item.badge}}</text>
+          </view>
+          <view class="item-info">
+            <text class="item-title">{{item.name}}</text>
+            <view wx:if="{{item.tags.length}}" class="item-tags">
+              <text class="item-tag" wx:for="{{item.tags}}" wx:key="*this" wx:for-item="tag">{{tag}}</text>
+            </view>
+            <view wx:if="{{item.guarantees.length}}" class="item-guarantees">
+              <text class="item-guarantee" wx:for="{{item.guarantees}}" wx:key="*this" wx:for-item="g">{{g}}</text>
+            </view>
+            <view class="item-bottom">
+              <view wx:if="{{item.price}}" class="item-price">
+                <text class="price-symbol">￥</text>
+                <text class="price-num">{{item.price}}</text>
+              </view>
+              <text wx:if="{{item.sales}}" class="item-sales">{{item.sales}}</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 底部常驻入口 -->
+  <view class="foot-bar">
+    <view class="foot-link" bindtap="goHospital">🏥 合作医院</view>
+    <text class="foot-divider">|</text>
+    <view class="foot-link" bindtap="goHelpers">🧑 服务人员</view>
+  </view>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

@@ -1,0 +1,201 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">陪诊预约</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="form-section">
+      <!-- 定位选点（顶部）：地图选择接送/服务地点（必填） -->
+      <view class="form-item" id="field-location">
+        <view class="form-label">
+          <text class="label-text">定位地址</text>
+          <text class="required">*</text>
+        </view>
+        <view class="location-box {{errors.locationText ? 'error-border' : ''}}" bindtap="onChooseLocation">
+          <text class="location-icon">📍</text>
+          <text class="location-text">{{locationText || '点击在地图上选择接送/服务地点'}}</text>
+          <text class="location-arrow">›</text>
+        </view>
+        <text wx:if="{{errors.locationText}}" class="error-text">{{errors.locationText}}</text>
+      </view>
+
+      <!-- 服务类型 -->
+      <view class="form-item" id="field-type">
+        <view class="form-label">
+          <text class="label-text">服务类型</text>
+          <text class="required">*</text>
+        </view>
+        <scroll-view wx:if="{{!typeLocked}}" scroll-x class="type-scroll {{errors.selectedType || errors.rmbAmount ? 'error-border' : ''}}" show-scrollbar="false">
+          <view class="type-chips">
+            <view
+              wx:for="{{types}}"
+              wx:key="name"
+              class="type-chip {{selectedType === item.name ? 'on' : ''}}"
+              bindtap="onTypeTap"
+              data-name="{{item.name}}"
+            >{{item.name}}</view>
+          </view>
+        </scroll-view>
+        <view wx:else class="form-picker locked">
+          <text class="picker-value">{{selectedType}}</text>
+        </view>
+        <!-- 选中类型即时展示对应金额（金额随类型联动，不依赖假数据） -->
+        <view wx:if="{{selectedType && rmbAmount}}" class="type-price-hint">
+          <text>已选「{{selectedType}}」 · 服务费</text>
+          <text class="type-price-amount">¥{{rmbAmount}}</text>
+        </view>
+        <text wx:if="{{errors.selectedType || errors.rmbAmount}}" class="error-text">{{errors.selectedType || errors.rmbAmount}}</text>
+      </view>
+
+      <!-- 就诊医院 -->
+      <view class="form-item" id="field-hospital">
+        <view class="form-label">
+          <text class="label-text">就诊医院</text>
+          <text class="required">*</text>
+        </view>
+        <view class="hospital-row">
+          <view class="form-picker half" bindtap="openCityPanel">
+            <text class="picker-value">{{currentCity}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+          <view class="form-picker half {{errors.selectedHospital ? 'error-border' : ''}}" bindtap="openHospitalPanel">
+            <text class="picker-value">{{selectedHospital || '请选择医院'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </view>
+        <text wx:if="{{errors.selectedHospital}}" class="error-text">{{errors.selectedHospital}}</text>
+      </view>
+
+      <!-- 帮办事项（多选） -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">帮办事项</text>
+        </view>
+        <view class="task-chips">
+          <view
+            wx:for="{{taskOptions}}"
+            wx:key="label"
+            wx:for-item="task"
+            wx:for-index="ti"
+            class="task-chip {{task.on ? 'on' : ''}}"
+            bindtap="onTaskTap"
+            data-idx="{{ti}}"
+          >{{task.label}}</view>
+        </view>
+      </view>
+
+      <!-- 谁就诊 -->
+      <view class="form-item" id="field-family">
+        <view class="form-label">
+          <text class="label-text">谁就诊</text>
+        </view>
+        <view class="who-row">
+          <view class="who-btn {{who === '本人' ? 'on' : ''}}" bindtap="onWhoTap" data-who="本人">本人</view>
+          <view class="who-btn {{who === '家人' ? 'on' : ''}}" bindtap="onWhoTap" data-who="家人">家人</view>
+        </view>
+        <view wx:if="{{who === '家人'}}" class="family-row">
+          <view class="family-col">
+            <input class="family-input {{errors.familyName ? 'error-border' : ''}}" placeholder="家人姓名" value="{{familyName}}" bindinput="onFamilyNameInput" />
+            <text wx:if="{{errors.familyName}}" class="error-text">{{errors.familyName}}</text>
+          </view>
+          <view class="family-col">
+            <input class="family-input {{errors.familyAge ? 'error-border' : ''}}" placeholder="家人年龄" type="number" value="{{familyAge}}" bindinput="onFamilyAgeInput" />
+            <text wx:if="{{errors.familyAge}}" class="error-text">{{errors.familyAge}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 服务时间（尽快服务 / 今天具体时间） -->
+      <view class="form-item" id="field-time">
+        <view class="form-label">
+          <text class="label-text">服务时间</text>
+          <text class="required">*</text>
+        </view>
+        <view class="form-picker {{errors.serviceTime ? 'error-border' : ''}}" bindtap="openTimePanel">
+          <text class="picker-value">{{selectedTimeLabel || '请选择服务时间'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <text wx:if="{{errors.serviceTime}}" class="error-text">{{errors.serviceTime}}</text>
+      </view>
+
+      <!-- 健康评估 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">健康评估</text>
+        </view>
+        <view class="assessment-box" bindtap="goAssessment">
+          <block wx:if="{{assessmentSummary}}">
+            <text class="assessment-badge">{{assessmentRisk}}</text>
+            <text class="assessment-text">{{assessmentSummary}}</text>
+          </block>
+          <text wx:else class="assessment-text">填写身体状况问卷，帮互助员提前了解照护需求（建议填写）</text>
+          <text class="assessment-arrow">›</text>
+        </view>
+      </view>
+
+      <!-- 参考价格（金额随所选服务类型联动） -->
+      <view wx:if="{{rmbAmount}}" class="form-item">
+        <view class="form-label">
+          <text class="label-text">参考价格</text>
+        </view>
+        <view class="price-row">
+          <text class="price-num">￥{{rmbAmount}}</text>
+        </view>
+        <text class="price-note">以人民币结算（模拟支付，提交后确认支付）</text>
+      </view>
+
+      <!-- 上传单据照片 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">上传单据照片</text>
+          <text class="label-optional">可选，最多3张</text>
+        </view>
+        <view class="image-upload">
+          <view class="image-list">
+            <view class="image-item" wx:for="{{images}}" wx:key="index">
+              <image src="{{item}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}" />
+              <view class="image-remove" catchtap="onRemoveImage" data-index="{{index}}">×</view>
+            </view>
+            <view class="upload-btn" wx:if="{{images.length < 3}}" bindtap="onUploadImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">添加照片</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 补充说明 -->
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">补充说明</text>
+          <text class="label-optional">可不填</text>
+        </view>
+        <textarea
+          class="form-textarea"
+          placeholder="如有其他要求请在这里说明"
+          value="{{note}}"
+          bindinput="onNoteInput"
+          maxlength="200"
+        />
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部提交栏 -->
+  <view class="bottom-bar">
+    <view class="publish-btn" bindtap="onPublish">
+      提交预约
+      <text class="publish-sub">提交后互助员即可接单</text>
+    </view>
+  </view>
+
+  <!-- 大字号选择面板（替代系统原生 picker） -->
+  <select-panel show="{{panelType === 'city'}}" title="选择城市" mode="list" options="{{cities}}" bind:select="onCitySelect" bind:cancel="onPanelCancel" />
+  <select-panel show="{{panelType === 'hospital'}}" title="选择医院" mode="list" options="{{hospitalOptions}}" bind:select="onHospitalSelect" bind:cancel="onPanelCancel" />
+  <select-panel show="{{panelType === 'time'}}" title="选择服务时间" mode="list" options="{{timeOptions}}" value="{{selectedTimeLabel}}" bind:select="onTimePanelSelect" bind:cancel="onPanelCancel" />
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

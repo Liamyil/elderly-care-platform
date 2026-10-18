@@ -1,0 +1,299 @@
+.page-container {
+  min-height: 100vh;
+  background: #F7F8FA;
+}
+
+.custom-nav {
+  background: #2D7D46;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx 20rpx;
+}
+
+.nav-left,
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-back-icon {
+  color: #ffffff;
+  font-size: 48rpx;
+}
+
+.nav-title {
+  color: #ffffff;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.nav-content {
+  padding: 24rpx;
+}
+
+.status-banner {
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.banner-pending {
+  background: #FFF7E6;
+  border: 1rpx solid #FFD591;
+}
+
+.banner-ok {
+  background: #E8F7EC;
+  border: 1rpx solid #95DEA4;
+}
+
+.banner-no {
+  background: #FFF1F0;
+  border: 1rpx solid #FFA39E;
+}
+
+.banner-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
+  color: #333;
+}
+
+.banner-text {
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.6;
+}
+
+.banner-time {
+  margin-top: 4rpx;
+  opacity: 0.85;
+}
+
+.form-card {
+  background: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  display: block;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.form-row-col {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-label {
+  width: 180rpx;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.form-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 手机号只读：灰字弱化 */
+.form-input-readonly {
+  color: #999999;
+}
+
+/* 年龄越界：边框变红 */
+.form-input.input-error {
+  color: #E5484D;
+  border-bottom: 2rpx solid #E5484D;
+}
+
+/* 年龄校验失败提示（红字） */
+.error-tip {
+  padding: 8rpx 0 8rpx 180rpx;
+  font-size: 24rpx;
+  color: #E5484D;
+}
+
+/* 性别单选 */
+.gender-group {
+  flex: 1;
+  display: flex;
+}
+
+.gender-item {
+  width: 140rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  text-align: center;
+  border-radius: 32rpx;
+  background: #F2F3F5;
+  color: #666;
+  font-size: 28rpx;
+  margin-right: 20rpx;
+}
+
+.gender-item.on {
+  background: #E8F7EC;
+  color: #2D7D46;
+  border: 2rpx solid #2D7D46;
+  box-sizing: border-box;
+}
+
+/* 常住区域定位按钮（与发布需求页同款配色，紧凑尺寸） */
+.locate-btn {
+  flex-shrink: 0;
+  height: 56rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 16rpx;
+  margin-left: 12rpx;
+  background-color: #E8F5E9;
+  border-radius: 12rpx;
+  font-size: 24rpx;
+  color: #2D7D46;
+  font-weight: bold;
+}
+
+/* 相关经验单选（选项较长，允许换行；圆角/配色/字号与性别单选一致） */
+.exp-group {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 12rpx;
+}
+
+.exp-item {
+  padding: 10rpx 20rpx;
+  border-radius: 32rpx;
+  background: #F2F3F5;
+  color: #666;
+  font-size: 28rpx;
+  margin: 0 12rpx 12rpx 0;
+}
+
+.exp-item.on {
+  background: #E8F7EC;
+  color: #2D7D46;
+  border: 2rpx solid #2D7D46;
+  box-sizing: border-box;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 160rpx;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  background: #F7F8FA;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+
+/* 官方推荐快捷标签：单条自动轮播（纵向向上，autoplay 3s 循环），点击追加到简介；
+   圆角/配色/字号与性别单选 pill 保持一致 */
+.quick-swiper {
+  width: 100%;
+  height: 72rpx;
+  margin-top: 16rpx;
+}
+
+.quick-swiper swiper-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-tag {
+  display: inline-block;
+  max-width: 96%;
+  padding: 10rpx 20rpx;
+  border-radius: 32rpx;
+  background: #F2F3F5;
+  color: #666;
+  font-size: 28rpx;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pledge-agree {
+  display: flex;
+  align-items: center;
+}
+
+.agree-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid #CCCCCC;
+  margin-right: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.agree-check.on {
+  background: #2D7D46;
+  border-color: #2D7D46;
+}
+
+/* 已勾选且置灰不可取消（上一步已签署） */
+.pledge-agree-locked {
+  opacity: 0.6;
+}
+
+.agree-check-locked {
+  background: #2D7D46;
+  border-color: #2D7D46;
+}
+
+.agree-text {
+  font-size: 26rpx;
+  color: #666;
+}
+
+.submit-btn {
+  background: #2D7D46;
+  color: #ffffff;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 44rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-top: 8rpx;
+}
+
+.submit-btn.disabled {
+  opacity: 0.6;
+}
+
+.bottom-tip {
+  text-align: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 20rpx;
+}
+
+.back-mine {
+  text-align: center;
+  color: #2D7D46;
+  font-size: 28rpx;
+  padding: 24rpx;
+}

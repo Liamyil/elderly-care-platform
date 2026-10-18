@@ -1,0 +1,74 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">管理员工作台</text>
+    <view class="nav-logout" bindtap="onLogout">退出</view>
+  </view>
+
+  <view class="nav-content">
+    <view wx:if="{{role === '民政管理员'}}" class="readonly-tip">
+      <text class="readonly-text">📖 当前为民政管理员：可查看全部数据（手机号已脱敏），可在订单页执行紧急干预（强制取消/强制指派，将写入操作日志）；其余操作只读</text>
+    </view>
+
+    <!-- 状态统计 -->
+    <view class="stats-card">
+      <view class="stat-item" bindtap="goOrders" data-status="reviewing">
+        <text class="stat-value">{{stats.reviewing || 0}}</text>
+        <text class="stat-label">待审核</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders" data-status="pending">
+        <text class="stat-value">{{stats.pending || 0}}</text>
+        <text class="stat-label">待接单</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders" data-status="dispatch_pool">
+        <text class="stat-value">{{stats.dispatch_pool || 0}}</text>
+        <text class="stat-label">待派单</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders" data-status="serving">
+        <text class="stat-value">{{stats.serving || 0}}</text>
+        <text class="stat-label">服务中</text>
+      </view>
+    </view>
+
+    <view class="stats-card">
+      <view class="stat-item" bindtap="goOrders" data-status="pending_confirm">
+        <text class="stat-value">{{stats.pending_confirm || 0}}</text>
+        <text class="stat-label">待确认</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders" data-status="completed">
+        <text class="stat-value">{{stats.completed || 0}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders" data-status="cancelled">
+        <text class="stat-value">{{stats.cancelled || 0}}</text>
+        <text class="stat-label">已取消</text>
+      </view>
+      <view class="stat-item" bindtap="goOrders">
+        <text class="stat-value total">{{(stats.reviewing || 0) + (stats.pending || 0) + (stats.dispatch_pool || 0) + (stats.serving || 0) + (stats.pending_confirm || 0) + (stats.completed || 0) + (stats.cancelled || 0)}}</text>
+        <text class="stat-label">全部订单</text>
+      </view>
+    </view>
+
+    <!-- 功能入口 -->
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goOrders">
+        <text class="menu-icon">📋</text>
+        <text class="menu-name">订单管理</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view wx:if="{{role === '管理员'}}" class="menu-item" bindtap="goHelperAudit">
+        <text class="menu-icon">📝</text>
+        <text class="menu-name">互助员申请审核</text>
+        <text class="menu-arrow">›</text>
+      </view>
+      <view class="menu-item" bindtap="goConfig">
+        <text class="menu-icon">⚙️</text>
+        <text class="menu-name">系统配置与日志</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="tip-card">
+      <text class="tip-text">手机上可完成：订单审核（通过/驳回）、待接单与待派单的互助员指派、订单取消与详情查看；互助员注册申请审核；基础业务参数调整（自动留痕）。民政管理员可在订单页执行紧急干预。</text>
+    </view>
+  </view>
+</view>

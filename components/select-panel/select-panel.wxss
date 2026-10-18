@@ -1,0 +1,91 @@
+.panel-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 300;
+}
+
+.panel-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.panel-header {
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.panel-cancel {
+  font-size: 32rpx;
+  color: #999999;
+}
+
+.panel-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.panel-confirm {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #2D7D46;
+}
+
+/* 列表模式 */
+.panel-list {
+  max-height: 60vh;
+}
+
+.panel-option {
+  height: 110rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-bottom: 1rpx solid #F5F5F5;
+}
+
+.panel-option-text {
+  font-size: 40rpx;
+  color: #333333;
+}
+
+/* 当前选中项高亮 */
+.panel-option-active .panel-option-text {
+  color: #2D7D46;
+  font-weight: bold;
+}
+
+.panel-option-check {
+  position: absolute;
+  right: 48rpx;
+  font-size: 36rpx;
+  color: #2D7D46;
+  font-weight: bold;
+}
+
+/* 日期模式 */
+.panel-date {
+  height: 420rpx;
+}
+
+.panel-date-item {
+  height: 100rpx;
+  line-height: 100rpx;
+  text-align: center;
+  font-size: 40rpx;
+  color: #333333;
+}

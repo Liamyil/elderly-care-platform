@@ -1,0 +1,91 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">互助员申请</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 申请状态横幅 -->
+    <view wx:if="{{application && application.status === 'pending'}}" class="status-banner banner-pending">
+      <text class="banner-title">⏳ 申请审核中</text>
+      <text class="banner-text">您的申请已提交，请等待社区管理员审核。</text>
+      <text wx:if="{{applyTimeText}}" class="banner-text banner-time">申请时间：{{applyTimeText}}</text>
+    </view>
+    <view wx:if="{{application && application.status === 'approved'}}" class="status-banner banner-ok">
+      <text class="banner-title">✅ 申请已通过</text>
+      <text class="banner-text">恭喜！您的申请已通过。进入小程序后将收到切换提示，确认后即可进入互助员端开始接单。</text>
+      <text wx:if="{{applyTimeText}}" class="banner-text banner-time">申请时间：{{applyTimeText}}</text>
+    </view>
+    <view wx:if="{{application && application.status === 'rejected'}}" class="status-banner banner-no">
+      <text class="banner-title">❌ 申请被驳回</text>
+      <text class="banner-text">驳回原因：{{application.rejectReason}}。可修改信息后重新提交。</text>
+      <text wx:if="{{applyTimeText}}" class="banner-text banner-time">申请时间：{{applyTimeText}}</text>
+    </view>
+
+    <!-- 申请表单（审核中时隐藏，切换为审核中状态） -->
+    <block wx:if="{{!application || application.status !== 'pending'}}">
+      <view class="form-card">
+        <text class="card-title">基本信息</text>
+        <view class="form-row">
+          <text class="form-label">真实姓名</text>
+          <input class="form-input" placeholder="请输入真实姓名" value="{{form.realName}}" data-field="realName" bindinput="onInput" disabled="{{application && application.status === 'approved'}}" />
+        </view>
+        <view class="form-row">
+          <text class="form-label">手机号</text>
+          <input class="form-input form-input-readonly" placeholder="未绑定手机号" value="{{form.phone}}" disabled />
+        </view>
+        <view class="form-row">
+          <text class="form-label">年龄</text>
+          <input class="form-input {{ageError ? 'input-error' : ''}}" type="number" placeholder="请输入您的真实年龄（18-70岁）" value="{{form.age}}" data-field="age" bindinput="onAgeInput" disabled="{{application && application.status === 'approved'}}" />
+        </view>
+        <view wx:if="{{ageError}}" class="error-tip">请输入18-70岁之间的年龄</view>
+        <view class="form-row">
+          <text class="form-label">性别</text>
+          <view class="gender-group">
+            <view class="gender-item {{form.gender === '男' ? 'on' : ''}}" bindtap="onGenderTap" data-gender="男">男</view>
+            <view class="gender-item {{form.gender === '女' ? 'on' : ''}}" bindtap="onGenderTap" data-gender="女">女</view>
+          </view>
+        </view>
+        <view class="form-row">
+          <text class="form-label">常住区域</text>
+          <input class="form-input area-input" placeholder="请输入您所在的区/街道（用于就近派单）" value="{{form.area}}" data-field="area" bindinput="onInput" disabled="{{application && application.status === 'approved'}}" />
+          <view class="locate-btn" bindtap="onLocateTap">📍定位获取</view>
+        </view>
+        <view class="form-row form-row-col">
+          <text class="form-label">相关经验</text>
+          <view class="exp-group">
+            <view wx:for="{{experienceOptions}}" wx:key="index" class="exp-item {{form.experience === item ? 'on' : ''}}" bindtap="onExperienceTap" data-experience="{{item}}">{{item}}</view>
+          </view>
+        </view>
+      </view>
+
+      <view class="form-card">
+        <text class="card-title">个人简介</text>
+        <view class="form-row form-row-col">
+          <textarea class="form-textarea" placeholder="介绍一下自己：服务经验、可服务时间等" value="{{form.intro}}" data-field="intro" bindinput="onInput" maxlength="200" disabled="{{application && application.status === 'approved'}}" />
+          <swiper class="quick-swiper" autoplay circular interval="3000" vertical="true">
+            <swiper-item wx:for="{{quickTags}}" wx:key="index">
+              <view class="quick-tag" bindtap="onQuickTagTap" data-text="{{item}}">{{item}}</view>
+            </swiper-item>
+          </swiper>
+        </view>
+      </view>
+
+      <view class="form-card">
+        <text class="card-title">互助员服务承诺书</text>
+        <view class="pledge-agree pledge-agree-locked">
+          <text class="agree-check agree-check-locked">✓</text>
+          <text class="agree-text">我已阅读并同意《互助员服务承诺书》</text>
+        </view>
+      </view>
+
+      <view class="submit-btn {{submitting ? 'disabled' : ''}}" bindtap="onSubmit">{{submitting ? '提交中...' : '提交申请'}}</view>
+      <view class="bottom-tip">提交后由社区管理员审核，通过后重新登录即可进入互助员端</view>
+    </block>
+
+    <view wx:if="{{application && application.status === 'pending'}}" class="back-mine" bindtap="goMine">返回「我的」</view>
+  </view>
+</view>

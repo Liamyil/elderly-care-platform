@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "backgroundColor": "#F7F8FA",
+  "usingComponents": {
+    "login-popup": "/components/login-popup/login-popup"
+  }
+}

@@ -1,0 +1,73 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">健康档案</text>
+    <view class="nav-right"></view>
+  </view>
+  <view class="nav-content">
+    <view class="profile-section">
+      <view class="profile-info">
+        <view class="avatar-wrapper">
+          <image class="avatar" src="/images/default_avatar.png" mode="aspectFill" />
+        </view>
+        <view class="user-info">
+          <text class="user-name">{{userInfo.name}}</text>
+          <text class="user-detail">{{userInfo.age}}岁 · {{userInfo.gender}}</text>
+        </view>
+      </view>
+      <view class="risk-tag {{userInfo.riskLevel}}">
+        {{userInfo.riskLevelText}}
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">健康指标</view>
+      <view class="metrics-grid">
+        <view class="metric-card" wx:for="{{healthMetrics}}" wx:key="key">
+          <text class="metric-icon">{{item.icon}}</text>
+          <text class="metric-value">{{item.value}}</text>
+          <text class="metric-label">{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">用药提醒</view>
+      </view>
+      <view class="medicine-list">
+        <view class="medicine-item" wx:for="{{medicines}}" wx:key="id" bindtap="onMedicineClick" data-id="{{item.id}}">
+          <view class="medicine-info">
+            <text class="medicine-name">{{item.name}}</text>
+            <text class="medicine-dosage">{{item.dosage}}</text>
+            <text class="medicine-time">{{item.takeTime}}</text>
+          </view>
+          <view class="medicine-status {{item.taken ? 'taken' : 'not-taken'}}">
+            {{item.taken ? '已服用' : '未服用'}}
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-header">
+        <view class="section-title">最近健康记录</view>
+        <view class="section-more" bindtap="onViewAllRecords">查看全部 ›</view>
+      </view>
+      <view class="record-list">
+        <view class="record-item" wx:for="{{healthRecords}}" wx:key="id" bindtap="onRecordClick" data-id="{{item.id}}">
+          <view class="record-left">
+            <text class="record-icon">{{item.icon}}</text>
+            <view class="record-info">
+              <text class="record-type">{{item.type}}</text>
+              <text class="record-time">{{item.time}}</text>
+            </view>
+          </view>
+          <text class="record-value">{{item.value}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

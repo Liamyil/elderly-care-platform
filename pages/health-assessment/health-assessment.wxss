@@ -1,0 +1,260 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+  padding-bottom: 200rpx;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 80rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-content {
+  padding-top: 180rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+/* 顶部说明卡 */
+.intro-card {
+  background: linear-gradient(135deg, #2D7D46 0%, #4CAF50 100%);
+  border-radius: 16rpx;
+  padding: 30rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+}
+
+.intro-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.intro-text {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+}
+
+/* 题目卡片 */
+.question-card {
+  margin-top: 24rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.question-title {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 22rpx;
+}
+
+.question-index {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: #2D7D46;
+  color: #ffffff;
+  font-size: 26rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.question-text {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+/* 选项大号芯片 */
+.option-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18rpx;
+}
+
+.option-chip {
+  border: 2rpx solid #dddddd;
+  border-radius: 16rpx;
+  padding: 18rpx 30rpx;
+  font-size: 32rpx;
+  color: #555555;
+  background-color: #ffffff;
+}
+
+.option-chip.on {
+  background-color: #2D7D46;
+  border-color: #2D7D46;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* 补充说明输入框 */
+.note-input {
+  width: 100%;
+  height: 140rpx;
+  border: 2rpx solid #dddddd;
+  border-radius: 12rpx;
+  padding: 16rpx;
+  font-size: 30rpx;
+  box-sizing: border-box;
+}
+
+/* ===== 结果卡片 ===== */
+.result-card {
+  margin-top: 24rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 44rpx 30rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.result-risk {
+  font-size: 56rpx;
+  font-weight: bold;
+}
+
+.result-title {
+  font-size: 30rpx;
+  color: #333333;
+  margin-top: 12rpx;
+}
+
+.result-summary {
+  width: 100%;
+  margin-top: 26rpx;
+  background-color: #F7F8FA;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  box-sizing: border-box;
+}
+
+.result-summary-label {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.result-summary-text {
+  font-size: 32rpx;
+  color: #333333;
+  line-height: 1.5;
+}
+
+.result-summary-note {
+  font-size: 28rpx;
+  color: #666666;
+}
+
+.result-tip {
+  width: 100%;
+  margin-top: 20rpx;
+  background-color: #FFF7E6;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  font-size: 26rpx;
+  color: #B26A00;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.result-hint {
+  width: 100%;
+  margin-top: 20rpx;
+  font-size: 24rpx;
+  color: #999999;
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.result-btns {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 32rpx;
+  width: 100%;
+}
+
+.btn-redo {
+  flex: 1;
+  text-align: center;
+  border: 2rpx solid #2D7D46;
+  color: #2D7D46;
+  border-radius: 44rpx;
+  padding: 22rpx 0;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.btn-finish {
+  flex: 1;
+  text-align: center;
+  background: linear-gradient(135deg, #2D7D46 0%, #4CAF50 100%);
+  color: #ffffff;
+  border-radius: 44rpx;
+  padding: 22rpx 0;
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+/* 底部提交栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+}
+
+.submit-btn {
+  background: linear-gradient(135deg, #2D7D46 0%, #4CAF50 100%);
+  color: #ffffff;
+  text-align: center;
+  border-radius: 44rpx;
+  padding: 24rpx 0;
+  font-size: 34rpx;
+  font-weight: bold;
+}

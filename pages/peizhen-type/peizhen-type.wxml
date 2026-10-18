@@ -1,0 +1,76 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">{{type.name}}</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 图片区：type.image 有值时按 1:1 正方形整幅展示，否则图标占位 -->
+    <view class="hero-img {{type.image ? 'hero-img-square' : ''}}">
+      <image wx:if="{{type.image}}" src="{{type.image}}" class="hero-img-image" mode="aspectFit" />
+      <block wx:else>
+        <text class="hero-icon">{{type.icon}}</text>
+        <text class="hero-name">{{type.name}}</text>
+        <text wx:if="{{type.category}}" class="hero-desc">{{type.category}}</text>
+      </block>
+    </view>
+
+    <!-- 基础信息（有数据才显示） -->
+    <view wx:if="{{type.baseInfo}}" class="section">
+      <view class="section-header">
+        <text class="section-title">基础信息</text>
+      </view>
+      <text class="base-text">{{type.baseInfo}}</text>
+    </view>
+
+    <!-- 参考价格 -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">参考价格</text>
+      </view>
+      <text class="price-value">{{type.price || '待定'}}</text>
+      <text wx:if="{{type.sales}}" class="sales-text">{{type.sales}}</text>
+      <text class="price-note">以人民币结算（支付功能接入中）</text>
+    </view>
+
+    <!-- 健康评估问卷入口 -->
+    <view class="section" bindtap="goAssessment">
+      <view class="section-header">
+        <text class="section-title">健康评估问卷</text>
+        <text wx:if="{{assessStatus}}" class="assess-status">{{assessStatus}}</text>
+      </view>
+      <view class="assess-row">
+        <text class="assess-desc">下单前填写身体状况，帮您匹配合适的陪诊人员（约 1 分钟）</text>
+        <text class="assess-arrow">›</text>
+      </view>
+    </view>
+
+    <!-- 用户评价（真实订单数据） -->
+    <view class="section">
+      <view class="section-header">
+        <text class="section-title">用户评价</text>
+        <text wx:if="{{evaluations.length}}" class="eval-count">{{evaluations.length}} 条</text>
+      </view>
+      <view wx:if="{{evaluations.length}}" class="eval-list">
+        <view class="eval-item" wx:for="{{evaluations}}" wx:key="index">
+          <view class="eval-head">
+            <text class="eval-stars">{{item.stars}}</text>
+            <text class="eval-helper">{{item.helper}}</text>
+            <text class="eval-date">{{item.date}}</text>
+          </view>
+          <text class="eval-comment">{{item.comment}}</text>
+        </view>
+      </view>
+      <view wx:else class="eval-empty">暂无评价，服务完成后欢迎点评</view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏：联系客服 + 立即下单 -->
+  <view class="bottom-bar">
+    <view class="bottom-contact" bindtap="onContact">📞 联系客服</view>
+    <view class="bottom-order" bindtap="onOrder">立即下单</view>
+  </view>
+</view>

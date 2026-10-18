@@ -1,0 +1,148 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">订单管理</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 状态页签 -->
+    <scroll-view scroll-x class="tabs-scroll" show-scrollbar="false">
+      <view class="tabs">
+        <view
+          wx:for="{{statusTabs}}"
+          wx:key="key"
+          class="tab {{currentStatus === item.key ? 'on' : ''}}"
+          bindtap="onTabTap"
+          data-key="{{item.key}}"
+        >{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <!-- 订单列表 -->
+    <view wx:if="{{list.length}}" class="order-list">
+      <view class="order-card" wx:for="{{list}}" wx:key="id">
+        <view class="order-head">
+          <text class="order-type">{{item.type}}{{item.subType ? ' · ' + item.subType : ''}}</text>
+          <text class="order-price">{{item.priceText ? '¥' + item.priceText : '🪙 ' + item.reward + '币'}}</text>
+        </view>
+        <text class="order-line">下单人：{{item.userNickname}}</text>
+        <text class="order-line">地址：{{item.address}}</text>
+        <text class="order-line">时间：{{item.time}}</text>
+        <text wx:if="{{item.helper}}" class="order-line">互助员：{{item.helper}}</text>
+        <text wx:if="{{item.timeout && (item.statusKey === 'pending' || item.statusKey === 'dispatch_pool')}}" class="assign-badge">⏰ 超时 {{item.minutesSincePublish}} 分钟 · 建议指派</text>
+
+        <view class="order-actions">
+          <block wx:if="{{role !== '民政管理员'}}">
+            <view wx:if="{{item.statusKey === 'reviewing'}}" class="btn btn-green" bindtap="onApprove" data-id="{{item.id}}">通过</view>
+            <view wx:if="{{item.statusKey === 'reviewing'}}" class="btn btn-orange" bindtap="onReject" data-id="{{item.id}}">驳回</view>
+            <view wx:if="{{item.statusKey === 'pending' || item.statusKey === 'dispatch_pool'}}" class="btn btn-green" bindtap="onAssign" data-id="{{item.id}}" data-label="{{item.type}}">指派</view>
+            <view wx:if="{{item.statusKey === 'pending' || item.statusKey === 'dispatch_pool' || item.statusKey === 'serving'}}" class="btn btn-orange" bindtap="onCancelOrder" data-id="{{item.id}}">取消</view>
+          </block>
+          <!-- 紧急干预（民政管理员）：强制取消/强制指派，原因必填 + 操作日志留痕 -->
+          <block wx:if="{{role === '民政管理员' && item.statusKey !== 'completed' && item.statusKey !== 'cancelled'}}">
+            <view class="btn btn-red" bindtap="onForceCancel" data-id="{{item.id}}" data-label="{{item.type}}">强制取消</view>
+            <view class="btn btn-green" bindtap="onForceAssign" data-id="{{item.id}}" data-label="{{item.type}}">强制指派</view>
+          </block>
+          <view class="btn btn-gray" bindtap="onDetail" data-id="{{item.id}}">详情</view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-state">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无{{currentLabel}}订单</text>
+    </view>
+  </view>
+
+  <!-- 指派弹层 -->
+  <view wx:if="{{showAssignModal}}" class="modal-mask" bindtap="onCloseAssign">
+    <view class="modal-sheet" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">选择互助员（{{assignOrderLabel}}）</text>
+        <view class="modal-close" bindtap="onCloseAssign">✕</view>
+      </view>
+      <scroll-view scroll-y class="helper-list">
+        <view class="helper-item" wx:for="{{helpers}}" wx:key="id" bindtap="onHelperTap" data-id="{{item.id}}" data-name="{{item.name}}">
+          <text class="helper-name">{{item.name}}</text>
+          <text class="helper-info">{{item.phone}} · 完成 {{item.serviceCount}} 单</text>
+        </view>
+        <view wx:if="{{!helpers.length}}" class="helper-empty">暂无互助员</view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 紧急干预弹层（高危操作：原因必填，写入操作日志） -->
+  <view wx:if="{{showForceModal}}" class="modal-mask" bindtap="onCloseForce">
+    <view class="modal-sheet" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">{{forceAction === 'assign' ? '强制指派 · 高危操作' : '强制取消 · 高危操作'}}</text>
+        <view class="modal-close" bindtap="onCloseForce">✕</view>
+      </view>
+      <scroll-view scroll-y class="force-body">
+        <text wx:if="{{forceOrderLabel}}" class="force-tip">订单：{{forceOrderLabel}}（{{forceOrderId}}）</text>
+        <block wx:if="{{forceAction === 'assign'}}">
+          <text class="force-label">选择互助员</text>
+          <view class="helper-item {{forceHelperId === item.id ? 'on' : ''}}" wx:for="{{forceHelpers}}" wx:key="id" bindtap="onForceHelperTap" data-id="{{item.id}}" data-name="{{item.name}}">
+            <text class="helper-name">{{item.name}}</text>
+            <text class="helper-info">{{item.phone}} · 完成 {{item.serviceCount}} 单</text>
+          </view>
+          <view wx:if="{{!forceHelpers.length}}" class="helper-empty">暂无互助员</view>
+        </block>
+        <text class="force-label">干预原因（必填，将写入操作日志）</text>
+        <textarea class="force-input" placeholder="请说明紧急干预的原因" value="{{forceReason}}" bindinput="onForceReasonInput" maxlength="100" />
+        <view class="force-confirm" bindtap="onForceConfirm">{{forceAction === 'assign' ? '确认强制指派' : '确认强制取消'}}</view>
+        <text class="force-warn">⚠️ 此操作将强制写入不可篡改的操作日志留痕</text>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 详情弹层 -->
+  <view wx:if="{{showDetailModal}}" class="modal-mask" bindtap="onCloseDetail">
+    <view class="modal-sheet" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">订单详情</text>
+        <view class="modal-close" bindtap="onCloseDetail">✕</view>
+      </view>
+      <scroll-view scroll-y class="detail-body">
+        <block wx:if="{{detail}}">
+          <text class="detail-line">订单号：{{detail.id}}</text>
+          <text class="detail-line">类型：{{detail.type}}{{detail.subType ? ' · ' + detail.subType : ''}}</text>
+          <text class="detail-line">状态：{{detail.status}}</text>
+          <text class="detail-line">下单人：{{detail.userNickname}}</text>
+          <text wx:if="{{detail.helper}}" class="detail-line">互助员：{{detail.helper}}</text>
+          <text class="detail-line">价格：{{detail.priceText ? '¥' + detail.priceText : detail.reward + '时间币'}}</text>
+          <text class="detail-line">地址：{{detail.address}}</text>
+          <text class="detail-line">时间：{{detail.time}}</text>
+          <text wx:if="{{detail.patientRelation || detail.patientName}}" class="detail-line">就诊人：{{detail.patientRelation}} {{detail.patientName}}{{detail.patientAge ? '（' + detail.patientAge + '岁）' : ''}}</text>
+          <text wx:if="{{detail.tasks && detail.tasks.length}}" class="detail-line">帮办事项：{{detail.tasks}}</text>
+          <text wx:if="{{detail.assessment}}" class="detail-line">健康评估：{{detail.assessment.risk}} · {{detail.assessment.summaryText}}</text>
+          <text wx:if="{{detail.remark}}" class="detail-line">需求描述：{{detail.remark}}</text>
+          <text wx:if="{{detail.cancelReason}}" class="detail-line">取消原因：{{detail.cancelReason}}</text>
+          <view wx:if="{{traces.length}}" class="trace-block">
+            <text class="trace-title">服务留痕（{{traces.length}}条）</text>
+            <view class="trace-item" wx:for="{{traces}}" wx:key="id">
+              <text class="trace-line">▸ {{item.kindName}} · {{item.time}}</text>
+              <text wx:if="{{item.locationText}}" class="trace-line">位置：{{item.locationText}}</text>
+              <view wx:if="{{item.photos.length}}" class="trace-photos">
+                <image
+                  wx:for="{{item.photos}}"
+                  wx:key="index"
+                  wx:for-item="p"
+                  class="trace-photo"
+                  src="{{p}}"
+                  mode="aspectFill"
+                  bindtap="onPreviewImage"
+                  data-current="{{p}}"
+                  data-urls="{{item.photos}}"
+                />
+              </view>
+            </view>
+          </view>
+        </block>
+      </scroll-view>
+    </view>
+  </view>
+</view>

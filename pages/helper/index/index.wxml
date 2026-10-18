@@ -1,0 +1,105 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <text class="nav-title">互助员 - 订单广场</text>
+  </view>
+
+  <view class="nav-content">
+    <view class="header">
+      <view class="location">
+        <text class="location-text">{{userTimeCoins}} 时间币</text>
+      </view>
+      <view class="message" bindtap="goToNotice">
+        <image class="message-icon" src="/images/tab/notification.png" mode="aspectFit" />
+        <view wx:if="{{hasUnreadMessages}}" class="message-dot"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="order-section">
+    <view class="order-header">
+      <view class="order-title">
+        <image class="order-title-icon" src="/images/tab/hospital.png" mode="aspectFit" />
+        <text>附近互助订单</text>
+      </view>
+    </view>
+
+    <view class="nearby-order-list">
+      <view class="nearby-order-card" wx:for="{{orders}}" wx:key="id">
+        <view class="nearby-card-header">
+          <view class="nearby-type-row">
+            <text class="nearby-order-type">{{item.type}}</text>
+            <text class="nearby-order-distance">{{item.distance}}</text>
+          </view>
+          <text class="nearby-order-reward">{{item.priceText ? ('¥' + item.priceText) : ('🪙 ' + item.reward + '时间币')}}</text>
+        <text wx:if="{{item.timeout}}" class="timeout-badge">⏰ 已发布 {{item.minutesSincePublish}} 分钟 · 优先接单</text>
+        <text wx:else class="publish-minutes">已发布 {{item.minutesSincePublish}} 分钟</text>
+        </view>
+
+        <view class="nearby-card-body">
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">发布用户：</text>
+            <text class="nearby-info-value">{{item.userNickname}}</text>
+          </view>
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">服务地址：</text>
+            <text class="nearby-info-value">{{item.address}}</text>
+          </view>
+          <view class="nearby-info-row">
+            <text class="nearby-info-label">预约时间：</text>
+            <text class="nearby-info-value">{{item.time}}</text>
+          </view>
+          <view wx:if="{{item.remark}}" class="nearby-info-row">
+            <text class="nearby-info-label">需求描述：</text>
+            <text class="nearby-info-value">{{item.remark}}</text>
+          </view>
+          <view wx:if="{{item.images && item.images.length > 0}}" class="nearby-info-row">
+            <text class="nearby-info-label">现场图片：</text>
+            <text class="nearby-view-images" catchtap="onViewImages" data-order-id="{{item.id}}">点击查看图片</text>
+          </view>
+          <view class="nearby-publish-row">
+            <text class="nearby-publish-label">发布时间：</text>
+            <text class="nearby-publish-time">{{item.publishTime}}</text>
+          </view>
+        </view>
+
+        <view class="nearby-card-footer">
+          <button class="btn-accept" catchtap="grabOrder" data-order-id="{{item.id}}">立即接单</button>
+        </view>
+      </view>
+
+      <view wx:if="{{orders.length === 0}}" class="nearby-empty">
+        <text class="nearby-empty-icon">📋</text>
+        <text class="nearby-empty-text">暂无附近订单</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showImageModal}}" class="modal-overlay image-modal-overlay" bindtap="onCloseImageModal">
+    <view class="image-modal-content" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">订单现场图片</text>
+        <view class="modal-close" bindtap="onCloseImageModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      <scroll-view scroll-x class="image-scroll" show-scrollbar="false">
+        <view class="image-preview-list">
+          <view wx:for="{{previewImages}}" wx:key="index" class="preview-item">
+            <image
+              src="{{item}}"
+              mode="aspectFill"
+              class="preview-image"
+              bindtap="onPreviewImage"
+              binderror="onImageError"
+              data-index="{{index}}"
+            />
+          </view>
+        </view>
+      </scroll-view>
+      <view class="image-tip">点击图片可放大查看</view>
+    </view>
+  </view>
+
+  <nav-bar selected="0"></nav-bar>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

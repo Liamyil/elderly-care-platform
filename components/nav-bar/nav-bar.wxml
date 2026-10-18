@@ -1,0 +1,12 @@
+<view class="nav-bar">
+  <view 
+    wx:for="{{tabs}}" 
+    wx:key="pagePath"
+    class="nav-item {{selected === index ? 'active' : ''}}"
+    bindtap="onTabTap"
+    data-index="{{index}}"
+  >
+    <image class="nav-icon" src="{{selected === index ? item.activeIcon : item.icon}}" mode="aspectFit" />
+    <text class="nav-text">{{item.text}}</text>
+  </view>
+</view>

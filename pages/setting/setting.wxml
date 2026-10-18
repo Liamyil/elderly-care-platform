@@ -1,0 +1,59 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">设置</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="menu-list">
+      <view class="menu-item" bindtap="goToProfile">
+        <text class="menu-icon">👤</text>
+        <text class="menu-name">个人信息</text>
+        <text class="menu-value">{{userName}}</text>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="goToEmergency">
+        <text class="menu-icon">📞</text>
+        <text class="menu-name">紧急联系人</text>
+        <text class="menu-value">{{emergencyCount}}人</text>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="goToAddress">
+        <text class="menu-icon">📍</text>
+        <text class="menu-name">常用地址</text>
+        <text class="menu-value">{{addressCount}}个</text>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item">
+        <text class="menu-icon">🔔</text>
+        <text class="menu-name">消息通知</text>
+        <switch checked="{{notificationOn}}" bindchange="onNotificationChange" color="#2D7D46" />
+      </view>
+
+      <view class="menu-item" bindtap="goToAbout">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-name">关于平台</text>
+        <text class="menu-value">V1.0.0</text>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <view class="menu-item" bindtap="onClearCache">
+        <text class="menu-icon">🗑️</text>
+        <text class="menu-name">清除缓存</text>
+        <text class="menu-value">{{cacheSize}}</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="logout-btn" bindtap="onLogout">
+      <text class="logout-text">退出登录</text>
+    </view>
+  </view>
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

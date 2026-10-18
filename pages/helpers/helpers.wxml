@@ -1,0 +1,27 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">服务人员</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="helper-card" wx:for="{{helpers}}" wx:key="name" bindtap="goDetail" data-name="{{item.name}}">
+      <view class="helper-avatar">🧑</view>
+      <view class="helper-info">
+        <view class="helper-name-row">
+          <text class="helper-name">{{item.name}}</text>
+          <text class="helper-badge">认证互助员</text>
+        </view>
+        <view class="helper-stars">{{item.starText}}</view>
+        <view class="helper-desc">已完成 {{item.serviceCount}} 单服务</view>
+      </view>
+    </view>
+
+    <view class="helper-note">
+      以上服务人员均为社区实名认证互助员，服务过程由平台全程监管留痕。
+    </view>
+  </view>
+</view>

@@ -1,0 +1,80 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">健康评估问卷</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 填写模式 -->
+    <block wx:if="{{!submitted}}">
+      <view class="intro-card">
+        <text class="intro-title">📋 下单前健康评估</text>
+        <text class="intro-text">为了给您匹配合适的陪诊人员，请如实填写身体状况（约 1 分钟）。仅用于服务匹配，不会公开。</text>
+      </view>
+
+      <view class="question-card" wx:for="{{questions}}" wx:key="key" wx:for-item="q" wx:for-index="qi">
+        <view class="question-title">
+          <text class="question-index">{{qi + 1}}</text>
+          <text class="question-text">{{q.title}}</text>
+        </view>
+        <view class="option-list">
+          <view
+            wx:for="{{q.options}}"
+            wx:key="label"
+            wx:for-item="opt"
+            wx:for-index="oi"
+            class="option-chip {{opt.on ? 'on' : ''}}"
+            bindtap="onOptionTap"
+            data-qi="{{qi}}"
+            data-idx="{{oi}}"
+          >{{opt.label}}</view>
+        </view>
+      </view>
+
+      <view class="question-card">
+        <view class="question-title">
+          <text class="question-index">7</text>
+          <text class="question-text">特殊照护需求（选填）</text>
+        </view>
+        <textarea
+          class="note-input"
+          placeholder="如：需要使用轮椅、吸氧设备、上下楼困难等"
+          value="{{note}}"
+          bindinput="onNoteInput"
+          maxlength="100"
+        />
+      </view>
+    </block>
+
+    <!-- 结果模式 -->
+    <block wx:else>
+      <view class="result-card">
+        <view class="result-risk" style="color: {{result.color}}">{{result.risk}}</view>
+        <text class="result-title">评估完成（风险分 {{result.score}} 分）</text>
+        <view class="result-summary">
+          <text class="result-summary-label">身体状况小结</text>
+          <text class="result-summary-text">{{summaryText}}</text>
+          <text wx:if="{{result.note}}" class="result-summary-note">补充：{{result.note}}</text>
+        </view>
+        <view wx:if="{{result.risk !== '低风险'}}" class="result-tip">
+          <text>💡 建议选择「全程陪诊」类服务，并在下单时注明照护需求，互助员可提前准备。</text>
+        </view>
+        <view class="result-hint">
+          <text>该评估结果将随您的陪诊订单一并提交给社区管理员与互助员。</text>
+        </view>
+        <view class="result-btns">
+          <view class="btn-redo" bindtap="onRedo">重新填写</view>
+          <view class="btn-finish" bindtap="onFinish">完成返回</view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 底部提交栏（填写模式） -->
+  <view wx:if="{{!submitted}}" class="bottom-bar">
+    <view class="submit-btn" bindtap="onSubmit">提交评估</view>
+  </view>
+</view>

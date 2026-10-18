@@ -1,0 +1,264 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+  padding-bottom: 200rpx;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 80rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-content {
+  padding-top: 180rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+/* 图片区（占位）：后续换成真实图片后，占位样式可整体替换 */
+.hero-img {
+  width: 100%;
+  height: 320rpx;
+  border-radius: 16rpx;
+  background: linear-gradient(135deg, #2D7D46 0%, #4CAF50 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-img-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 有设计图时按 1:1 正方形整幅展示（内容区宽 686rpx，同高即正方形） */
+.hero-img-square {
+  height: 686rpx;
+}
+
+.hero-icon {
+  font-size: 100rpx;
+}
+
+.hero-name {
+  font-size: 40rpx;
+  font-weight: bold;
+  color: #ffffff;
+  margin-top: 12rpx;
+}
+
+.hero-desc {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.9);
+  margin-top: 10rpx;
+}
+
+/* 区块 */
+.section {
+  margin-top: 28rpx;
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.section-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+/* 基础信息 */
+.base-text {
+  font-size: 28rpx;
+  color: #444444;
+  line-height: 1.6;
+}
+
+/* 参考价格 */
+.price-value {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #E8852E;
+}
+
+.sales-text {
+  display: block;
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 8rpx;
+}
+
+.price-note {
+  display: block;
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 10rpx;
+}
+
+/* 底部操作栏 */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: 20rpx;
+  z-index: 100;
+}
+
+.bottom-contact {
+  flex: 1;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #2D7D46;
+  border: 2rpx solid #2D7D46;
+  border-radius: 44rpx;
+  padding: 22rpx 0;
+  background-color: #ffffff;
+}
+
+.bottom-order {
+  flex: 1;
+  text-align: center;
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(135deg, #2D7D46 0%, #4CAF50 100%);
+  border-radius: 44rpx;
+  padding: 22rpx 0;
+}
+
+/* 健康评估入口 */
+.assess-status {
+  font-size: 26rpx;
+  color: #2D7D46;
+  background-color: #E8F5E9;
+  border-radius: 8rpx;
+  padding: 4rpx 14rpx;
+  font-weight: bold;
+}
+
+.assess-row {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.assess-desc {
+  flex: 1;
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.5;
+}
+
+.assess-arrow {
+  font-size: 40rpx;
+  color: #CCCCCC;
+}
+
+/* 用户评价 */
+.eval-count {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.eval-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+}
+
+.eval-item {
+  border-bottom: 1rpx solid #F0F0F0;
+  padding-bottom: 20rpx;
+}
+
+.eval-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.eval-head {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.eval-stars {
+  font-size: 26rpx;
+  color: #FFB400;
+  letter-spacing: 2rpx;
+}
+
+.eval-helper {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: bold;
+}
+
+.eval-date {
+  margin-left: auto;
+  font-size: 24rpx;
+  color: #BBBBBB;
+}
+
+.eval-comment {
+  display: block;
+  margin-top: 12rpx;
+  font-size: 28rpx;
+  color: #555555;
+  line-height: 1.5;
+}
+
+.eval-empty {
+  font-size: 26rpx;
+  color: #999999;
+  text-align: center;
+  padding: 20rpx 0;
+}

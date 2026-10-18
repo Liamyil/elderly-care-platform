@@ -1,0 +1,305 @@
+/* 陪诊服务选择页：左分类 + 右列表（按设计提示词，rpx 自适应） */
+.page-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* 顶部导航：高度 = padding-top(状态栏高度) + 内容行 88rpx，不写死总高度（刘海屏适配） */
+.custom-nav {
+  background-color: #2D7D46;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 16rpx;
+  box-sizing: border-box;
+}
+
+.nav-back-icon {
+  font-size: 60rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+  height: 88rpx;
+}
+
+/* 次级头部：服务站 + 地区下拉（箭头紧贴文字，留一个空格） */
+.sub-header {
+  height: 88rpx;
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 32rpx;
+  flex-shrink: 0;
+}
+
+.sub-header-text {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.sub-header-arrow {
+  font-size: 40rpx;
+  color: #999999;
+  margin-left: 12rpx;
+}
+
+/* 自绘地区下拉面板 */
+.city-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+}
+
+.city-panel {
+  background-color: #ffffff;
+  border-radius: 0 0 16rpx 16rpx;
+  overflow: hidden;
+}
+
+.city-item {
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.city-item-text {
+  font-size: 40rpx;
+  color: #333333;
+}
+
+.city-item-check {
+  font-size: 36rpx;
+  color: #28A7E7;
+  font-weight: bold;
+}
+
+/* 主体：左窄右宽 */
+.body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+/* 左侧分类栏（约 20% 宽） */
+.sidebar {
+  width: 150rpx;
+  background-color: #F8F8F8;
+  flex-shrink: 0;
+}
+
+.side-item {
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  color: #666666;
+  position: relative;
+}
+
+.side-item-active {
+  background-color: #ffffff;
+  color: #28A7E7;
+  font-weight: bold;
+}
+
+.side-item-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6rpx;
+  height: 44rpx;
+  background-color: #28A7E7;
+  border-radius: 0 3rpx 3rpx 0;
+}
+
+/* 右侧列表区（80% 宽，左内边距 20rpx） */
+.right {
+  flex: 1;
+  background-color: #ffffff;
+  padding-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.right-title {
+  font-size: 34rpx;
+  font-weight: bold;
+  color: #333333;
+  padding: 20rpx 0;
+  flex-shrink: 0;
+}
+
+.right-scroll {
+  flex: 1;
+  height: 0;
+}
+
+/* 列表卡片 */
+.item-card {
+  display: flex;
+  padding: 20rpx 20rpx 20rpx 0;
+  border-bottom: 1rpx solid #EEEEEE;
+}
+
+.item-img {
+  width: 180rpx;
+  height: 180rpx; /* 1:1 正方形（用户要求） */
+  border-radius: 8rpx;
+  background-color: #F2F8F4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.item-img-icon {
+  font-size: 56rpx;
+}
+
+.item-img-image {
+  width: 100%;
+  height: 100%;
+}
+
+.item-img-badge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: #1D5FA8;
+  color: #ffffff;
+  font-size: 18rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 0 0 8rpx 0;
+}
+
+.item-info {
+  flex: 1;
+  margin-left: 16rpx;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-title {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #333333;
+}
+
+.item-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.item-tag {
+  font-size: 20rpx;
+  color: #28A7E7;
+  background-color: #E6F7FF;
+  border-radius: 4rpx;
+  padding: 2rpx 8rpx;
+}
+
+/* 保障行：青蓝色描边标签 */
+.item-guarantees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 8rpx;
+}
+
+.item-guarantee {
+  font-size: 22rpx;
+  color: #2BC0E4;
+  background-color: transparent;
+  border: 2rpx solid #2BC0E4;
+  border-radius: 6rpx;
+  padding: 4rpx 12rpx;
+}
+
+/* 底部行：价格在左，销量靠右 */
+.item-bottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 10rpx;
+}
+
+.item-price {
+  color: #FF4D4F;
+  font-weight: bold;
+}
+
+.price-symbol {
+  font-size: 34rpx;
+}
+
+.price-num {
+  font-size: 34rpx;
+}
+
+.item-sales {
+  font-size: 22rpx;
+  color: #999999;
+}
+
+/* 底部常驻入口（合作医院/服务人员） */
+.foot-bar {
+  height: 100rpx;
+  background-color: #ffffff;
+  border-top: 1rpx solid #EEEEEE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.foot-link {
+  font-size: 28rpx;
+  color: #333333;
+  padding: 0 24rpx;
+}
+
+.foot-divider {
+  color: #DDDDDD;
+}

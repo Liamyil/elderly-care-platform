@@ -1,0 +1,61 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">关于平台</text>
+    <view class="nav-right"></view>
+  </view>
+  <view class="nav-content">
+    <view class="logo-section">
+      <view class="logo-wrapper">
+        <text class="logo-text">互助养老</text>
+      </view>
+      <text class="platform-name">智慧互助养老平台</text>
+      <text class="version-info">版本号：V1.0.0</text>
+    </view>
+
+    <view class="content-section">
+      <view class="section-title">平台简介</view>
+      <view class="intro-text">
+        本平台围绕低龄帮高龄、健康帮弱疾、邻里互助、智慧赋能、全程留痕、可监管可激励核心目标，构建政府监管+社区运营+老人自主服务+邻里互助+时间银行激励+智能安全守护六位一体的智慧互助养老体系。
+      </view>
+    </view>
+
+    <view class="content-section">
+      <view class="section-title">政策依据</view>
+      <view class="policy-list">
+        <view class="policy-item">
+          <text class="policy-num">1.</text>
+          <text class="policy-text">民政部等11部门《关于推进互助性养老服务发展的意见》（2026年）</text>
+        </view>
+        <view class="policy-item">
+          <text class="policy-num">2.</text>
+          <text class="policy-text">民发〔2024〕17号《基本养老服务综合平台试点通知》</text>
+        </view>
+        <view class="policy-item">
+          <text class="policy-num">3.</text>
+          <text class="policy-text">《智慧健康养老产业发展行动计划》</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="content-section">
+      <view class="section-title">联系方式</view>
+      <view class="contact-info">
+        <view class="contact-item">
+          <text class="contact-icon">📞</text>
+          <text class="contact-text">客服电话：400-888-9999</text>
+        </view>
+        <view class="contact-item">
+          <text class="contact-icon">🕐</text>
+          <text class="contact-text">服务时间：工作日 0:00-24:00</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="copyright-section">
+      <text class="copyright-text">Copyright © 2026 智慧互助养老平台</text>
+    </view>
+  </view>
+</view>

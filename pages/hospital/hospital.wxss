@@ -1,0 +1,131 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.custom-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: #2D7D46;
+  height: 160rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 100;
+}
+
+.nav-left {
+  width: 80rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.nav-back-icon {
+  font-size: 80rpx;
+  color: #ffffff;
+  line-height: 1;
+}
+
+.nav-title {
+  font-size: 36rpx;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-content {
+  padding-top: 180rpx;
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+}
+
+/* 城市切换 */
+.city-tabs {
+  display: flex;
+  white-space: nowrap;
+  margin-bottom: 24rpx;
+}
+
+.city-tab {
+  display: inline-block;
+  font-size: 32rpx;
+  color: #666666;
+  background-color: #ffffff;
+  border-radius: 32rpx;
+  padding: 12rpx 36rpx;
+  margin-right: 20rpx;
+}
+
+.city-tab-active {
+  background-color: #2D7D46;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* 医院卡片 */
+.hospital-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.hospital-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hospital-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333333;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.hospital-level {
+  font-size: 22rpx;
+  font-weight: bold;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+  white-space: nowrap;
+}
+
+/* 医院等级配色：三甲橙、三乙蓝、二甲绿（WXSS 选择器不支持中文，用英文代号） */
+.lv-3a {
+  color: #E8852E;
+  background-color: #FDF1E3;
+}
+
+.lv-3b {
+  color: #3E7A9E;
+  background-color: #EAF2F8;
+}
+
+.lv-2a {
+  color: #2D7D46;
+  background-color: #EBF5F0;
+}
+
+.hospital-addr {
+  font-size: 26rpx;
+  color: #888888;
+  margin-top: 14rpx;
+}
+
+/* 底部说明 */
+.hospital-note {
+  font-size: 24rpx;
+  color: #999999;
+  text-align: center;
+  padding: 20rpx 40rpx 40rpx;
+  line-height: 1.6;
+}

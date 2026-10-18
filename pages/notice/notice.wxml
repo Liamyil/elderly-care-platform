@@ -1,0 +1,39 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">消息中心</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="message-list">
+      <view 
+        wx:for="{{filteredMessages}}" 
+        wx:key="id" 
+        class="message-item {{item.isRead ? 'read' : 'unread'}}"
+        bindtap="onMessageClick"
+        data-id="{{item.id}}"
+      >
+        <view class="message-icon-wrapper order">
+          <text class="message-icon">📋</text>
+        </view>
+        <view class="message-content">
+          <view class="message-title-row">
+            <text class="message-title">{{item.title}}</text>
+            <view wx:if="{{!item.isRead}}" class="message-dot"></view>
+          </view>
+          <text class="message-desc">{{item.content}}</text>
+          <text class="message-time">{{item.time}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{filteredMessages.length === 0}}" class="empty-state">
+        <text class="empty-icon">📭</text>
+        <text class="empty-text">暂无消息</text>
+        <text class="empty-hint">订单状态变更时将在此处显示</text>
+      </view>
+    </view>
+  </view>
+</view>

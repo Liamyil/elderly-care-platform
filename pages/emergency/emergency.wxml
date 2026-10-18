@@ -1,0 +1,71 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">紧急联系人</text>
+    <view class="nav-right" bindtap="onAdd">
+      <text class="add-btn">添加</text>
+    </view>
+  </view>
+
+  <view class="nav-content">
+    <view wx:if="{{contacts.length > 0}}" class="contact-list">
+      <view 
+        wx:for="{{contacts}}" 
+        wx:key="id" 
+        class="contact-item"
+      >
+        <view class="contact-info">
+          <text class="contact-name">{{item.name}}</text>
+          <text class="contact-relation">{{item.relation}}</text>
+          <text class="contact-phone">{{item.phone}}</text>
+        </view>
+        <view class="contact-actions">
+          <view class="delete-btn" bindtap="onDelete" data-id="{{item.id}}">
+            <text class="delete-text">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{contacts.length === 0}}" class="empty-state">
+      <text class="empty-icon">📞</text>
+      <text class="empty-text">暂无紧急联系人</text>
+      <text class="empty-hint">点击右上角添加</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddModal}}" class="modal-overlay" bindtap="onCloseModal">
+    <view class="modal-content" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">{{editingId ? '编辑联系人' : '添加联系人'}}</text>
+        <view class="modal-close" bindtap="onCloseModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">姓名</text>
+          <input class="form-input" placeholder="请输入姓名" value="{{formData.name}}" bindinput="onNameInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">关系</text>
+          <input class="form-input" placeholder="如：儿子、女儿" value="{{formData.relation}}" bindinput="onRelationInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">手机号</text>
+          <input class="form-input" placeholder="请输入手机号" value="{{formData.phone}}" bindinput="onPhoneInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-gray btn-full" bindtap="onCloseModal">取消</button>
+        <button 
+          class="btn btn-green btn-full {{canSubmit ? '' : 'btn-disabled'}}" 
+          bindtap="onSubmit"
+          disabled="{{!canSubmit}}"
+        >确定</button>
+      </view>
+    </view>
+  </view>
+</view>

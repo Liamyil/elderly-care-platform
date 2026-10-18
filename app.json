@@ -1,0 +1,88 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/account/account",
+    "pages/admin/index/index",
+    "pages/admin/orders/orders",
+    "pages/order/order",
+    "pages/bank/bank",
+    "pages/mine/mine",
+    "pages/helper/index/index",
+    "pages/helper/order/order",
+    "pages/helper/bank/bank",
+    "pages/helper/mine/mine",
+    "pages/health/health",
+    "pages/rating/rating",
+    "pages/about/about",
+    "pages/publish/publish",
+    "pages/peizhen/peizhen",
+    "pages/peizhen-type/peizhen-type",
+    "pages/peizhen-order/peizhen-order",
+    "pages/health-assessment/health-assessment",
+    "pages/helper/trace/trace",
+    "pages/hospital/hospital",
+    "pages/helpers/helpers",
+    "pages/helper-detail/helper-detail",
+    "pages/sos/sos",
+    "pages/setting/setting",
+    "pages/notice/notice",
+    "pages/profile/profile",
+    "pages/emergency/emergency",
+    "pages/address/address",
+    "pages/serviceExchange/serviceExchange",
+    "pages/giftExchange/giftExchange",
+    "pages/helper/apply/apply",
+    "pages/admin/helper-audit/helper-audit",
+    "pages/admin/config/config"
+  ],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "互助养老",
+    "navigationBarBackgroundColor": "#2D7D46",
+    "backgroundColor": "#F7F8FA"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#2D7D46",
+    "borderStyle": "white",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/tab/home.png",
+        "selectedIconPath": "images/tab/home_active.png"
+      },
+      {
+        "pagePath": "pages/order/order",
+        "text": "订单",
+        "iconPath": "images/tab/order.png",
+        "selectedIconPath": "images/tab/order_active.png"
+      },
+      {
+        "pagePath": "pages/bank/bank",
+        "text": "时间银行",
+        "iconPath": "images/tab/bank.png",
+        "selectedIconPath": "images/tab/bank_active.png"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的",
+        "iconPath": "images/tab/mine.png",
+        "selectedIconPath": "images/tab/mine_active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "componentFramework": "glass-easel",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于服务打卡时记录您的位置，作为服务留痕依据"
+    }
+  },
+  "requiredPrivateInfos": [
+    "chooseLocation"
+  ]
+}

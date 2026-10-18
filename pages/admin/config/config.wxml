@@ -1,0 +1,63 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">系统配置</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view wx:if="{{role === '民政管理员'}}" class="readonly-tip">
+      <text class="readonly-text">📖 民政管理员为只读监管：可查看配置与操作日志，不可修改配置</text>
+    </view>
+
+    <!-- 页签 -->
+    <view class="seg-tabs">
+      <view class="seg-tab {{activeTab === 'config' ? 'on' : ''}}" bindtap="onTabTap" data-tab="config">业务参数</view>
+      <view class="seg-tab {{activeTab === 'logs' ? 'on' : ''}}" bindtap="onTabTap" data-tab="logs">操作日志</view>
+    </view>
+
+    <!-- 业务参数 -->
+    <block wx:if="{{activeTab === 'config'}}">
+      <view class="config-card" wx:for="{{configs}}" wx:key="configKey">
+        <view class="config-row">
+          <view class="config-info">
+            <text class="config-name">{{item.label}}</text>
+            <text class="config-meta">修改于 {{item.updatedAt}}</text>
+          </view>
+          <view class="config-value">
+            <text class="config-num">{{item.configValue}}</text>
+            <text class="config-unit">{{item.unit}}</text>
+          </view>
+        </view>
+        <view wx:if="{{role !== '民政管理员'}}" class="config-edit" bindtap="onEditConfig" data-key="{{item.configKey}}">修改</view>
+      </view>
+
+      <view class="tip-card">
+        <text class="tip-text">每次修改都会写入不可篡改的操作日志（操作人、时间、修改前后内容），可在「操作日志」页签查看。</text>
+      </view>
+    </block>
+
+    <!-- 操作日志 -->
+    <block wx:if="{{activeTab === 'logs'}}">
+      <view wx:if="{{logs.length}}" class="log-list">
+        <view class="log-card" wx:for="{{logs}}" wx:key="id">
+          <view class="log-head">
+            <text class="log-type">{{item.typeLabel}}</text>
+            <text class="log-time">{{item.createdAt}}</text>
+          </view>
+          <text class="log-line">操作人：{{item.operatorName}}</text>
+          <text wx:if="{{item.beforeContent}}" class="log-line">修改前：{{item.beforeContent}}</text>
+          <text wx:if="{{item.afterContent}}" class="log-line">修改后：{{item.afterContent}}</text>
+          <text wx:if="{{item.remark}}" class="log-line log-remark">原因/备注：{{item.remark}}</text>
+        </view>
+        <view wx:if="{{logs.length < logTotal}}" class="load-more" bindtap="onLoadMore">{{loadingLogs ? '加载中...' : '加载更多'}}</view>
+      </view>
+      <view wx:else class="empty-state">
+        <text class="empty-icon">📜</text>
+        <text class="empty-text">暂无操作日志</text>
+      </view>
+    </block>
+  </view>
+</view>

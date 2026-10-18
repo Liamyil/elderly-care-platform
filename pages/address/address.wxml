@@ -1,0 +1,79 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">常用地址</text>
+    <view class="nav-right" bindtap="onAdd">
+      <text class="add-btn">添加</text>
+    </view>
+  </view>
+
+  <view class="nav-content">
+    <view wx:if="{{addresses.length > 0}}" class="address-list">
+      <view 
+        wx:for="{{addresses}}" 
+        wx:key="id" 
+        class="address-item"
+      >
+        <view class="address-info">
+          <view class="address-header">
+            <text class="address-name">{{item.name}}</text>
+            <view wx:if="{{item.isDefault}}" class="default-tag">
+              <text class="default-text">默认</text>
+            </view>
+          </view>
+          <text class="address-detail">{{item.detail}}</text>
+        </view>
+        <view class="address-actions">
+          <view 
+            wx:if="{{!item.isDefault}}" 
+            class="default-btn" 
+            bindtap="onSetDefault" 
+            data-id="{{item.id}}"
+          >
+            <text class="default-btn-text">设为默认</text>
+          </view>
+          <view class="delete-btn" bindtap="onDelete" data-id="{{item.id}}">
+            <text class="delete-text">删除</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{addresses.length === 0}}" class="empty-state">
+      <text class="empty-icon">📍</text>
+      <text class="empty-text">暂无常用地址</text>
+      <text class="empty-hint">点击右上角添加</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showAddModal}}" class="modal-overlay" bindtap="onCloseModal">
+    <view class="modal-content" catchtap="preventClose">
+      <view class="modal-header">
+        <text class="modal-title">{{editingId ? '编辑地址' : '添加地址'}}</text>
+        <view class="modal-close" bindtap="onCloseModal">
+          <text class="close-icon">×</text>
+        </view>
+      </view>
+      <view class="modal-body">
+        <view class="form-item">
+          <text class="form-label">地址名称</text>
+          <input class="form-input" placeholder="如：家、儿子家" value="{{formData.name}}" bindinput="onNameInput" />
+        </view>
+        <view class="form-item">
+          <text class="form-label">详细地址</text>
+          <textarea class="form-textarea" placeholder="请输入详细地址" value="{{formData.detail}}" bindinput="onDetailInput" />
+        </view>
+      </view>
+      <view class="modal-footer">
+        <button class="btn btn-gray btn-full" bindtap="onCloseModal">取消</button>
+        <button 
+          class="btn btn-green btn-full {{canSubmit ? '' : 'btn-disabled'}}" 
+          bindtap="onSubmit"
+          disabled="{{!canSubmit}}"
+        >确定</button>
+      </view>
+    </view>
+  </view>
+</view>

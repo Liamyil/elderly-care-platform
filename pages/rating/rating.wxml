@@ -1,0 +1,96 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">服务评价</text>
+    <view class="nav-right"></view>
+  </view>
+  <view class="nav-content">
+    <view wx:if="{{orders.length > 0}}" class="order-list">
+      <view class="section-header">
+        <view class="section-title">待评价订单</view>
+        <text class="order-count">{{orders.length}}条待评价</text>
+      </view>
+      <view class="order-card" wx:for="{{orders}}" wx:key="id">
+        <view class="order-left-bar"></view>
+        <view class="order-content">
+          <view class="order-header">
+            <text class="order-type">{{item.type}}</text>
+            <text class="order-time">{{item.date}}</text>
+          </view>
+          <view class="order-helper">
+            <text class="helper-label">互助员：</text>
+            <text class="helper-name">{{item.helper}}</text>
+          </view>
+          <view class="order-address">
+            <text class="address-icon">📍</text>
+            <text class="address-text">{{item.address}}</text>
+          </view>
+          <view class="order-footer">
+            <text class="order-reward">🪙 {{item.reward}}时间币</text>
+            <view class="rating-btn" bindtap="onRatingClick" data-id="{{item.id}}">去评价</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view wx:else class="empty-state">
+      <text class="empty-icon">😊</text>
+      <text class="empty-text">暂无待评价订单</text>
+      <text class="empty-hint">所有服务都已评价完成</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showRatingModal}}" class="rating-modal-overlay" bindtap="onCloseRatingModal">
+    <view class="rating-modal-content" catchtap="preventClose">
+      <view class="rating-modal-header">
+        <text class="rating-modal-title">评价服务</text>
+        <view class="rating-modal-close" bindtap="onCloseRatingModal">
+          <text class="close-text">✕</text>
+        </view>
+      </view>
+      <view class="rating-modal-body">
+        <view class="rating-section">
+          <text class="rating-label">服务评分</text>
+          <view class="star-rating">
+            <text
+              class="star {{item <= currentRating ? 'active' : ''}}"
+              wx:for="{{starList}}"
+              wx:key="*this"
+              bindtap="onStarClick"
+              data-score="{{item}}"
+            >★</text>
+          </view>
+          <text class="rating-hint">{{ratingHint}}</text>
+        </view>
+
+        <view class="tags-section">
+          <text class="tags-label">评价标签</text>
+          <view class="tags-list">
+            <text
+              class="tag {{item.on ? 'selected' : ''}}"
+              wx:for="{{tagOptions}}"
+              wx:key="label"
+              bindtap="onTagClick"
+              data-tag="{{item.label}}"
+            >{{item.label}}</text>
+          </view>
+        </view>
+
+        <view class="input-section">
+          <text class="input-label">评价内容（选填）</text>
+          <textarea 
+            class="rating-input" 
+            placeholder="请输入您对本次服务的评价..."
+            value="{{ratingText}}"
+            bindinput="onRatingInput"
+          />
+        </view>
+      </view>
+      <view class="rating-modal-footer">
+        <view class="submit-btn" bindtap="onSubmitRating">提交评价</view>
+      </view>
+    </view>
+  </view>
+</view>

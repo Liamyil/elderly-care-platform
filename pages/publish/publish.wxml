@@ -1,0 +1,110 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">发布需求</text>
+    <view class="nav-right"></view>
+  </view>
+  <view class="nav-content">
+    <view class="form-section">
+      <view class="form-item" id="field-type">
+        <view class="form-label">
+          <text class="label-text">服务类型</text>
+          <text class="required">*</text>
+        </view>
+        <view class="form-picker {{errors.selectedServiceType ? 'error-border' : ''}}" bindtap="openTypePanel">
+          <text class="picker-value">{{selectedServiceType || '请选择服务类型'}}{{subType ? ' · ' + subType : ''}}</text>
+          <text class="picker-arrow">{{typeLocked ? '' : '›'}}</text>
+        </view>
+        <text wx:if="{{errors.selectedServiceType}}" class="error-text">{{errors.selectedServiceType}}</text>
+      </view>
+
+      <!-- 健康评估（仅陪诊服务显示，问卷页填写后随订单提交） -->
+      <view wx:if="{{selectedServiceType === '陪诊服务'}}" class="form-item">
+        <view class="form-label">
+          <text class="label-text">健康评估</text>
+        </view>
+        <view class="assessment-box" bindtap="goAssessment">
+          <block wx:if="{{assessmentSummary}}">
+            <text class="assessment-badge">{{assessmentRisk}}</text>
+            <text class="assessment-text">{{assessmentSummary}}</text>
+          </block>
+          <text wx:else class="assessment-text">填写身体状况问卷，帮互助员提前了解照护需求（建议填写）</text>
+          <text class="assessment-arrow">›</text>
+        </view>
+      </view>
+
+      <view class="form-item" id="field-time">
+        <view class="form-label">
+          <text class="label-text">服务时间</text>
+          <text class="required">*</text>
+        </view>
+        <view class="form-picker {{errors.serviceTime ? 'error-border' : ''}}" bindtap="openTimePanel">
+          <text class="picker-value">{{selectedTimeLabel || '请选择服务时间'}}</text>
+          <text class="picker-arrow">›</text>
+        </view>
+        <text wx:if="{{errors.serviceTime}}" class="error-text">{{errors.serviceTime}}</text>
+      </view>
+
+      <view class="form-item" id="field-address">
+        <view class="form-label">
+          <text class="label-text">详情地址</text>
+          <text class="required">*</text>
+        </view>
+        <view class="address-row">
+          <input
+            class="form-input address-input {{errors.address ? 'error-border' : ''}}"
+            placeholder="请输入详细地址"
+            value="{{address}}"
+            bindinput="onAddressInput"
+          />
+          <view class="locate-btn" bindtap="onChooseLocation">📍 定位</view>
+        </view>
+        <text wx:if="{{errors.address}}" class="error-text">{{errors.address}}</text>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">需求描述</text>
+        </view>
+        <textarea 
+          class="form-textarea" 
+          placeholder="请详细描述您的需求..."
+          value="{{description}}"
+          bindinput="onDescriptionInput"
+          maxlength="200"
+        />
+        <text class="char-count">{{description.length}}/200</text>
+      </view>
+
+      <view class="form-item">
+        <view class="form-label">
+          <text class="label-text">上传图片</text>
+        </view>
+        <view class="image-upload">
+          <view class="image-list">
+            <view class="image-item" wx:for="{{images}}" wx:key="index">
+              <image src="{{item}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}" />
+              <view class="image-remove" catchtap="onRemoveImage" data-index="{{index}}">×</view>
+            </view>
+            <view class="upload-btn" wx:if="{{images.length < 3}}" bindtap="onUploadImage">
+              <text class="upload-icon">+</text>
+              <text class="upload-text">添加图片</text>
+            </view>
+          </view>
+          <text class="upload-hint">最多上传3张图片</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="bottom-bar">
+    <view class="publish-btn" bindtap="onPublish">发布需求</view>
+  </view>
+
+  <!-- 大字号选择面板（替代系统原生 picker） -->
+  <select-panel show="{{panelType === 'type'}}" title="选择服务类型" mode="list" options="{{serviceTypes}}" bind:select="onTypePanelSelect" bind:cancel="onPanelCancel" />
+  <select-panel show="{{panelType === 'time'}}" title="选择服务时间" mode="list" options="{{timeOptions}}" value="{{selectedTimeLabel}}" bind:select="onTimePanelSelect" bind:cancel="onPanelCancel" />
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>

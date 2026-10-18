@@ -1,0 +1,71 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">{{kindName}}</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <!-- 订单信息 -->
+    <view class="form-item" wx:if="{{order}}">
+      <view class="form-label">
+        <text class="label-text">服务订单</text>
+      </view>
+      <view class="order-line">
+        <text class="order-type">{{order.type}}</text>
+        <text class="order-reward">🪙 {{order.reward}}时间币</text>
+      </view>
+      <text class="order-addr">服务地址：{{order.address}}</text>
+      <text wx:if="{{order.time}}" class="order-addr">预约时间：{{order.time}}</text>
+    </view>
+
+    <!-- 定位 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">当前定位</text>
+        <text class="required">*</text>
+      </view>
+      <view wx:if="{{locationText}}" class="location-done">
+        <text class="location-text">📍 {{locationText}}</text>
+        <text class="location-time">定位时间 {{locationTime}}</text>
+      </view>
+      <view wx:else class="location-todo">
+        <text class="location-text">点击下方按钮在地图上选择您的位置</text>
+      </view>
+      <view class="location-btn" bindtap="onGetLocation">
+        <text>{{locationText ? '重新选择位置' : '获取定位'}}</text>
+      </view>
+    </view>
+
+    <!-- 现场照片 -->
+    <view class="form-item">
+      <view class="form-label">
+        <text class="label-text">现场照片</text>
+        <text class="required">*</text>
+        <text class="label-optional">至少1张，最多3张</text>
+      </view>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{images}}" wx:key="index">
+          <image src="{{item}}" mode="aspectFill" bindtap="onPreviewImage" data-index="{{index}}" />
+          <view class="image-remove" catchtap="onRemoveImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="upload-btn" wx:if="{{images.length < 3}}" bindtap="onTakePhoto">
+          <text class="upload-icon">📷</text>
+          <text class="upload-text">拍照/选图</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 说明 -->
+    <view class="tip-card">
+      <text class="tip-text">打卡将记录您当前定位与现场照片，作为服务留痕依据，管理员可在后台查看。</text>
+    </view>
+  </view>
+
+  <!-- 底部提交栏 -->
+  <view class="bottom-bar">
+    <view class="submit-btn" bindtap="onSubmit">提交{{kindName}}</view>
+  </view>
+</view>

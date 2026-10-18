@@ -1,0 +1,47 @@
+# 智慧互助养老平台 - SpringBoot 后端配置
+server:
+  # 端口：默认 3000（与原 Node 版一致，小程序无需改配置）；可用环境变量 PORT 覆盖
+  port: ${PORT:3000}
+
+spring:
+  datasource:
+    # 与原 Node 版共用同一个 elderly_care 数据库
+    url: jdbc:mysql://localhost:3306/elderly_care?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: '123456'
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      # none = 不自动建表/改表，表结构由 backend/init.sql 管理
+      ddl-auto: none
+    open-in-view: false
+    show-sql: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 16MB
+
+# 平台自定义配置
+app:
+  # JWT 密钥：部署时用环境变量 JWT_SECRET 覆盖
+  jwt-secret: ${JWT_SECRET:elderly-care-secret-key-2026-0123456789}
+  # 图片访问基础地址：留空则自动检测局域网 IP（对应原版 IMAGE_BASE_URL）
+  base-url: ${BASE_URL:}
+  # 上传目录：放在项目文件夹之外，避免微信开发者工具因图片写入触发自动重新编译
+  upload-dir: D:/elderly-care-data/uploads
+  # 微信订阅消息（appid/secret 与模板ID 在微信公众平台获取；留空则订阅消息静默跳过）
+  wechat:
+    appid: ${WECHAT_APPID:wx10023d2b4307a19e}
+    secret: ${WECHAT_SECRET:1174d84714a8b9e5cbc7a5995510da8d}
+    template-assign: ${WECHAT_TPL_ASSIGN:}
+    template-timeout: ${WECHAT_TPL_TIMEOUT:}
+    template-settle: ${WECHAT_TPL_SETTLE:}
+    # developer=开发版 / trial=体验版 / formal=正式版
+    miniprogram-state: ${WECHAT_MP_STATE:trial}
+  # 短信兜底（阿里云；AccessKey 留空则静默跳过）
+  sms:
+    access-key-id: ${SMS_AK:}
+    access-key-secret: ${SMS_SK:}
+    sign-name: ${SMS_SIGN:}
+    template-assign: ${SMS_TPL_ASSIGN:}
+    template-timeout: ${SMS_TPL_TIMEOUT:}
