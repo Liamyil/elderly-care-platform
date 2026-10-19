@@ -26,6 +26,11 @@
       </view>
       <view class="stat-divider"></view>
       <view class="stat-item">
+        <text class="stat-value">{{userInfo.rmbBalance}}</text>
+        <text class="stat-label">人民币余额（元）</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
         <text class="stat-value">{{userInfo.serviceCount}}</text>
         <text class="stat-label">已完成订单</text>
       </view>

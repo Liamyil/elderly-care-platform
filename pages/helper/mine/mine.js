@@ -1,5 +1,5 @@
 const app = getApp()
-const { BankAPI, OrderAPI } = require('../../../utils/api')
+const { BankAPI, OrderAPI, UserAPI } = require('../../../utils/api')
 
 Page({
   data: {
@@ -10,6 +10,7 @@ Page({
       role: '互助员',
       avatar: '',
       timeCoins: 0,
+      rmbBalance: 0,
       serviceCount: 0,
       evaluationScore: '5.0'
     },
@@ -43,6 +44,14 @@ Page({
     try {
       var user = app.globalData.userInfo
       var balanceData = await BankAPI.getBalance()
+      var rmbBalance = 0
+      try {
+        // 人民币余额（元）：来自 /api/user/info 的 rmbBalance 字段（双轨制，陪诊单结算入账）
+        var infoData = await UserAPI.getUserInfo()
+        rmbBalance = infoData.rmbBalance || 0
+      } catch (e) {
+        console.error('获取人民币余额失败:', e)
+      }
 
       this.setData({
         userInfo: {
@@ -51,6 +60,7 @@ Page({
           role: '互助员',
           avatar: user.avatar || '',
           timeCoins: balanceData.balance || 0,
+          rmbBalance: rmbBalance,
           serviceCount: user.serviceCount || 0,
           evaluationScore: user.evaluationScore || '5.0'
         }
@@ -65,6 +75,7 @@ Page({
           role: '互助员',
           avatar: user.avatar || '',
           timeCoins: 0,
+          rmbBalance: 0,
           serviceCount: 0,
           evaluationScore: '5.0'
         }
