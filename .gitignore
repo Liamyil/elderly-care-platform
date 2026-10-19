@@ -7,3 +7,4 @@ dist/
 *.class
 .DS_Store
 project.private.config.json
+账号密码.text
