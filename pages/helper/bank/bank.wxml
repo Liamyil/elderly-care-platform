@@ -83,3 +83,5 @@
   <nav-bar selected="2"></nav-bar>
   <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
 </view>
+
+<global-toast id="globalToast" />

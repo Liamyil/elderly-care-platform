@@ -51,3 +51,5 @@
     </view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +76,25 @@ public interface OrderRepository extends JpaRepository<Order, String> {
 
     /** 按状态统计数量 */
     long countByStatusKeyAndIsDeleted(String statusKey, Integer isDeleted);
+
+    /** 用户参与的已完成订单数（作为下单人或互助员，实时统计替代存量 service_count 列） */
+    @Query("select count(o) from Order o where o.isDeleted = 0 and o.statusKey = 'completed' and (o.userId = :uid or o.helperId = :uid)")
+    long countCompletedByUser(@Param("uid") Long uid);
+
+    /** 互助员真实评分均值（仅统计已评价订单；从未被评价返回 null，前端显示「暂无」） */
+    @Query("select avg(o.rating) from Order o where o.isDeleted = 0 and o.helperId = :uid and o.rating is not null")
+    Double avgRatingByHelper(@Param("uid") Long uid);
+
+    /** 用户人民币消费累计（陪诊订单已支付金额合计，未支付/已退款不计入） */
+    @Query("select coalesce(sum(o.rmbAmount), 0) from Order o where o.isDeleted = 0 and o.userId = :uid and o.assetType = 'rmb' and o.payStatus = 'paid'")
+    BigDecimal sumRmbSpentByUser(@Param("uid") Long uid);
+
+    /** 已完成订单按参与人分组计数（批量场景用，key=userId / key=helperId） */
+    @Query("select o.userId, count(o) from Order o where o.isDeleted = 0 and o.statusKey = 'completed' group by o.userId")
+    List<Object[]> countCompletedGroupByUser();
+
+    @Query("select o.helperId, count(o) from Order o where o.isDeleted = 0 and o.statusKey = 'completed' and o.helperId is not null group by o.helperId")
+    List<Object[]> countCompletedGroupByHelper();
 
     /** 互助员进行中订单数（服务中 + 待确认，并发订单数上限校验用） */
     long countByHelperIdAndStatusKeyInAndIsDeleted(Long helperId, List<String> statusKeys, Integer isDeleted);

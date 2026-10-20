@@ -111,7 +111,7 @@
 }
 
 .stat-value {
-  font-size: 56rpx;
+  font-size: 64rpx;
   color: #2D7D46;
   font-weight: bold;
   display: block;
@@ -126,7 +126,7 @@
 
 .stat-divider {
   width: 1rpx;
-  height: 80rpx;
+  height: 96rpx;
   background-color: #F0F0F0;
 }
 

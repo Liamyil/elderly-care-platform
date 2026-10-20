@@ -11,7 +11,8 @@ const FIELD_ANCHORS = {
 Page({
   data: {
     statusBarHeight: 0,
-    serviceTypes: ['助餐服务', '助洁服务', '陪诊服务', '代买代办', '日常陪伴', '助浴服务', '理发服务', '维修服务', '法律咨询', '心理关怀'],
+    // 「陪诊服务」已从通用发布页移除（该类型走人民币+模拟支付，必须从专属下单页 pages/peizhen-order 进入）
+    serviceTypes: ['助餐服务', '助洁服务', '代买代办', '日常陪伴', '助浴服务', '理发服务', '维修服务', '法律咨询', '心理关怀'],
     selectedServiceType: '',
     typeIndex: 0,
     subType: '',

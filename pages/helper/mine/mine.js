@@ -12,7 +12,7 @@ Page({
       timeCoins: 0,
       rmbBalance: 0,
       serviceCount: 0,
-      evaluationScore: '5.0'
+      evaluationScore: '暂无'
     },
     showLogin: false
   },
@@ -62,7 +62,8 @@ Page({
           timeCoins: balanceData.balance || 0,
           rmbBalance: rmbBalance,
           serviceCount: user.serviceCount || 0,
-          evaluationScore: user.evaluationScore || '5.0'
+          // 真实评分：来自 /api/user/info 的评价均值；从未被评价为 null → 显示「暂无」（不再兜底 5.0）
+          evaluationScore: infoData.evaluationScore || '暂无'
         }
       })
     } catch (error) {
@@ -77,7 +78,7 @@ Page({
           timeCoins: 0,
           rmbBalance: 0,
           serviceCount: 0,
-          evaluationScore: '5.0'
+          evaluationScore: '暂无'
         }
       })
     }
@@ -114,6 +115,10 @@ Page({
 
   goToBank() {
     wx.reLaunch({ url: '/pages/helper/bank/bank' })
+  },
+
+  goToRmbBill() {
+    wx.navigateTo({ url: '/pages/helper/rmb-bill/rmb-bill' })
   },
 
   goToEvaluation() {

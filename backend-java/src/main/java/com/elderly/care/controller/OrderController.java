@@ -67,10 +67,10 @@ public class OrderController {
         return orderService.mine(uid(request), status);
     }
 
-    /** 订单详情（需登录） */
+    /** 订单详情（需登录）：按查看人身份下发时间轴与联系方式（未接单脱敏） */
     @GetMapping("/orders/{orderId}")
-    public Result<Map<String, Object>> detail(@PathVariable String orderId) {
-        return orderService.detail(orderId);
+    public Result<Map<String, Object>> detail(HttpServletRequest request, @PathVariable String orderId) {
+        return orderService.detail(uid(request), orderId);
     }
 
     /** 发布订单（需登录） */

@@ -3,7 +3,8 @@ const { OrderAPI } = require('../../utils/api')
 Page({
   data: {
     statusBarHeight: 0,
-    orders: [],
+    pendingOrders: [],
+    ratedOrders: [],
     showRatingModal: false,
     currentOrderId: '',
     currentRating: 5,
@@ -38,31 +39,54 @@ Page({
     wx.showLoading({ title: '加载中...', mask: true })
     try {
       const allOrders = await OrderAPI.getOrders('completed')
-      const orders = Array.isArray(allOrders) ? allOrders.filter(o => !o.evaluated).map(o => ({
+      const completedOrders = Array.isArray(allOrders) ? allOrders : []
+
+      // 待评价：完成后未评价的订单
+      const pendingOrders = completedOrders.filter(o => !o.evaluated).map(o => ({
         id: o.id,
         type: o.type,
         helper: o.helper || '互助员',
         date: o.time ? o.time.split(' ')[0] : '',
         address: o.address,
         reward: o.reward
-      })) : []
+      }))
+
+      // 已评价：展示我给互助员写过的评价（星级 + 内容）
+      const ratedOrders = completedOrders.filter(o => o.evaluated).map(o => {
+        const rating = o.rating || 5
+        return {
+          id: o.id,
+          type: o.type,
+          helper: o.helper || '互助员',
+          date: o.time ? o.time.split(' ')[0] : '',
+          rating: rating,
+          stars: this.buildStars(rating),
+          comment: o.comment || '未填写评价内容'
+        }
+      })
 
       // 定向评价模式：只保留目标订单，并直接弹出其评价框
-      let targetOrders = orders
+      let targetOrders = pendingOrders
       if (this._targetOrderId) {
-        targetOrders = orders.filter(function (o) { return o.id === this._targetOrderId }.bind(this))
+        targetOrders = pendingOrders.filter(function (o) { return o.id === this._targetOrderId }.bind(this))
         if (targetOrders.length > 0) {
           this.onRatingClick({ currentTarget: { dataset: { id: this._targetOrderId } } })
         }
       }
 
-      this.setData({ orders: targetOrders })
+      this.setData({ pendingOrders: targetOrders, ratedOrders })
     } catch (error) {
       console.error('加载订单失败:', error ? (error.stack || error.message || JSON.stringify(error)) : 'unknown')
-      this.setData({ orders: [] })
+      this.setData({ pendingOrders: [], ratedOrders: [] })
     } finally {
       wx.hideLoading()
     }
+  },
+
+  /** 评分 → 星级字符（已评价记录展示用）：★★★★☆ */
+  buildStars(rating) {
+    const n = Math.max(1, Math.min(5, parseInt(rating) || 5))
+    return '★'.repeat(n) + '☆'.repeat(5 - n)
   },
 
   goBack() {
@@ -142,9 +166,20 @@ Page({
 
       await OrderAPI.evaluateOrder(this.data.currentOrderId, this.data.currentRating, comment)
 
-      const updatedOrders = this.data.orders.filter(item => item.id !== this.data.currentOrderId)
+      // 评价成功：订单从「待评价」移入「我写过的评价」
+      const doneOrder = this.data.pendingOrders.find(item => item.id === this.data.currentOrderId) || {}
+      const newRated = {
+        id: this.data.currentOrderId,
+        type: doneOrder.type || '',
+        helper: doneOrder.helper || '互助员',
+        date: doneOrder.date || '',
+        rating: this.data.currentRating,
+        stars: this.buildStars(this.data.currentRating),
+        comment: comment || '未填写评价内容'
+      }
       this.setData({
-        orders: updatedOrders,
+        pendingOrders: this.data.pendingOrders.filter(item => item.id !== this.data.currentOrderId),
+        ratedOrders: [newRated].concat(this.data.ratedOrders),
         showRatingModal: false
       })
 

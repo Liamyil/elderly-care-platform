@@ -104,6 +104,15 @@ Page({
     wx.navigateTo({ url: '/pages/notice/notice' })
   },
 
+  /** 大厅卡片点击 → 订单详情页（未接单只能看到脱敏信息，接单后可见完整联系方式） */
+  goOrderDetail(e) {
+    var orderId = e.currentTarget.dataset.id
+    if (!orderId) return
+    wx.navigateTo({
+      url: '/pages/order-detail/order-detail?id=' + orderId
+    })
+  },
+
   grabOrder(e) {
     var orderId = e.currentTarget.dataset.orderId
     var order = this.data.orders.find(function (o) { return o.id === orderId })

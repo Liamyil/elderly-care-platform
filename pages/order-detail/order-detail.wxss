@@ -1,0 +1,218 @@
+.page-container {
+  min-height: 100vh;
+  background-color: #F7F8FA;
+}
+
+.custom-nav {
+  background: #2D7D46;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24rpx 20rpx;
+}
+
+.nav-left,
+.nav-right {
+  width: 80rpx;
+}
+
+.nav-back-icon {
+  font-size: 48rpx;
+  color: #ffffff;
+}
+
+.nav-title {
+  font-size: 34rpx;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.nav-content {
+  padding: 16rpx 0 40rpx;
+  box-sizing: border-box;
+}
+
+/* 状态横幅 */
+.status-banner {
+  display: flex;
+  justify-content: center;
+  padding: 4rpx 32rpx 16rpx;
+}
+
+.status-text {
+  font-size: 28rpx;
+  padding: 10rpx 32rpx;
+  border-radius: 28rpx;
+  font-weight: bold;
+}
+
+.status-text.pending {
+  background-color: #FFF3E0;
+  color: #E8852E;
+}
+
+.status-text.serving {
+  background-color: #EBF5F0;
+  color: #2D7D46;
+}
+
+.status-text.pending_confirm {
+  background-color: #FFF3E0;
+  color: #E8852E;
+}
+
+.status-text.completed {
+  background-color: #F5F5F5;
+  color: #999999;
+}
+
+.status-text.cancelled {
+  background-color: #F5F5F5;
+  color: #BBBBBB;
+}
+
+/* 信息卡片 */
+.detail-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 24rpx;
+  margin: 0 32rpx 20rpx;
+}
+
+.card-title {
+  display: block;
+  font-size: 30rpx;
+  color: #2D7D46;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  padding-bottom: 16rpx;
+  border-bottom: 1rpx solid #F0F0F0;
+}
+
+.info-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.info-row:last-child {
+  margin-bottom: 0;
+}
+
+.info-label {
+  font-size: 26rpx;
+  color: #999999;
+  flex-shrink: 0;
+  width: 160rpx;
+}
+
+.info-value {
+  font-size: 26rpx;
+  color: #333333;
+  flex: 1;
+  word-break: break-all;
+}
+
+/* 时间轴：圆点 + 竖线 */
+.timeline {
+  padding-left: 8rpx;
+}
+
+.timeline-item {
+  display: flex;
+  position: relative;
+  padding-bottom: 32rpx;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+/* 竖线（除最后一项外） */
+.timeline-item::after {
+  content: '';
+  position: absolute;
+  left: 7rpx;
+  top: 28rpx;
+  bottom: 0;
+  width: 2rpx;
+  background-color: #E5E5E5;
+}
+
+.timeline-item:last-child::after {
+  display: none;
+}
+
+.timeline-dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: 50%;
+  background-color: #2D7D46;
+  margin: 8rpx 20rpx 0 0;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-body {
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.timeline-label {
+  font-size: 26rpx;
+  color: #999999;
+}
+
+.timeline-time {
+  font-size: 28rpx;
+  color: #333333;
+  font-weight: bold;
+}
+
+/* 联系方式 */
+.contact-hint {
+  display: block;
+  font-size: 26rpx;
+  color: #999999;
+  padding: 8rpx 0;
+}
+
+.call-btn {
+  display: inline-block;
+  width: auto;
+  margin: 16rpx 0 4rpx;
+  padding: 0 36rpx;
+  height: 64rpx;
+  line-height: 64rpx;
+  border-radius: 32rpx;
+  background-color: #E8F5EC;
+  color: #2D7D46;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: 2rpx solid #B7DFC3;
+}
+
+.call-btn::after {
+  border: none;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 120rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}

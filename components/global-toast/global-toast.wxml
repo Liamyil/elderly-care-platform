@@ -1,0 +1,6 @@
+<view wx:if="{{rendered}}" class="global-toast-wrap {{visible ? 'show' : ''}}" bindtap="onTap">
+  <view class="toast-body">
+    <text class="toast-title">{{title}}</text>
+    <text class="toast-content">{{content}}</text>
+  </view>
+</view>

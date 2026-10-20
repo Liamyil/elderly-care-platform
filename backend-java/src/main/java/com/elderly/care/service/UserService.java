@@ -6,10 +6,12 @@ import com.elderly.care.config.PasswordHasher;
 import com.elderly.care.entity.HelperApplication;
 import com.elderly.care.entity.User;
 import com.elderly.care.repository.HelperApplicationRepository;
+import com.elderly.care.repository.OrderRepository;
 import com.elderly.care.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +27,17 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final WechatService wechatService;
     private final HelperApplicationRepository helperApplicationRepository;
+    private final OrderRepository orderRepository;
 
     public UserService(UserRepository userRepository, PasswordHasher passwordHasher, JwtUtil jwtUtil,
-                       WechatService wechatService, HelperApplicationRepository helperApplicationRepository) {
+                       WechatService wechatService, HelperApplicationRepository helperApplicationRepository,
+                       OrderRepository orderRepository) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
         this.jwtUtil = jwtUtil;
         this.wechatService = wechatService;
         this.helperApplicationRepository = helperApplicationRepository;
+        this.orderRepository = orderRepository;
     }
 
     /**
@@ -344,6 +349,14 @@ public class UserService {
 
     /** 全部用户列表（公开接口，H5 后台用户管理会用到） */
     public Result<List<Map<String, Object>>> listAll() {
+        Map<Long, Long> asUser = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByUser()) {
+            asUser.put((Long) row[0], (Long) row[1]);
+        }
+        Map<Long, Long> asHelper = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByHelper()) {
+            asHelper.put((Long) row[0], (Long) row[1]);
+        }
         List<Map<String, Object>> rows = new ArrayList<>();
         for (User u : userRepository.findAll()) {
             Map<String, Object> row = new LinkedHashMap<>();
@@ -352,7 +365,8 @@ public class UserService {
             row.put("name", u.getName());
             row.put("role", u.getRole());
             row.put("time_coins", u.getTimeCoins());
-            row.put("service_count", u.getServiceCount());
+            // 实时统计该用户参与的已完成订单数（下单 + 接单，替代存量 service_count 列）
+            row.put("service_count", (int) (asUser.getOrDefault(u.getId(), 0L) + asHelper.getOrDefault(u.getId(), 0L)));
             rows.add(row);
         }
         return Result.ok(rows);
@@ -378,7 +392,13 @@ public class UserService {
         info.put("isHelper", isHelper(user));
         info.put("timeCoins", user.getTimeCoins());
         info.put("rmbBalance", user.getRmbBalance());
-        info.put("serviceCount", user.getServiceCount());
+        // 实时统计该用户参与的已完成订单数（下单 + 接单，替代存量 service_count 列）
+        info.put("serviceCount", (int) orderRepository.countCompletedByUser(user.getId()));
+        // 互助员真实评分均值（无评价为 null，前端显示「暂无」），保留 1 位小数
+        Double avgRating = orderRepository.avgRatingByHelper(user.getId());
+        info.put("evaluationScore", avgRating == null ? null : Math.round(avgRating * 10) / 10.0);
+        // 人民币消费累计（陪诊订单已支付金额合计，未支付/已退款不计入）
+        info.put("rmbSpent", orderRepository.sumRmbSpentByUser(user.getId()));
         info.put("avatar", user.getAvatar());
         info.put("wechatBound", user.getOpenid() != null && !user.getOpenid().isBlank());
         return info;

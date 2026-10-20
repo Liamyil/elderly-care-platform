@@ -7,10 +7,14 @@
 const app = getApp()
 const { UserAPI } = require('../../../utils/api')
 
+// 真实姓名校验：仅中文/英文字母，2-20 位（前后端同规则，防乱码/特殊符号/数字）
+const REAL_NAME_REG = /^[a-zA-Z一-龥]{2,20}$/
+
 Page({
   data: {
     statusBarHeight: 0,
     form: { realName: '', phone: '', age: '', gender: '男', area: '', experience: '', intro: '' },
+    nameError: false,
     ageError: false,
     quickTags: [
       '耐心细致，善于与老人沟通，时间充裕。',
@@ -60,6 +64,17 @@ Page({
   onInput(e) {
     const field = e.currentTarget.dataset.field
     this.setData({ ['form.' + field]: e.detail.value })
+  },
+
+  /** 真实姓名实时校验：仅中英文（2-20 位），不合法时红框 + 红字提示 */
+  onRealNameInput(e) {
+    const value = e.detail.value
+    this.setData({ 'form.realName': value })
+    if (value === '') {
+      this.setData({ nameError: false })
+      return
+    }
+    this.setData({ nameError: !REAL_NAME_REG.test(value.trim()) })
   },
 
   /** 年龄输入实时校验：18~70，越界时红框 + 红字提示 */
@@ -123,6 +138,10 @@ Page({
     if (this.data.submitting) return
     const f = this.data.form
     if (!f.realName.trim()) return this.toast('请填写真实姓名')
+    if (this.data.nameError || !REAL_NAME_REG.test(f.realName.trim())) {
+      this.setData({ nameError: true })
+      return this.toast('请输入真实的姓名（仅限中英文字母）')
+    }
     if (!f.phone.trim()) return this.toast('请先在账号与安全页绑定手机号')
     if (f.age === '') return this.toast('请填写年龄')
     const age = Number(f.age)

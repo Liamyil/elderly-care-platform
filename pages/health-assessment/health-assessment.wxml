@@ -78,3 +78,5 @@
     <view class="submit-btn" bindtap="onSubmit">提交评估</view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

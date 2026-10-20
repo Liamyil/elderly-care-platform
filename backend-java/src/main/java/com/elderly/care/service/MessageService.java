@@ -40,8 +40,29 @@ public class MessageService {
             row.put("type", m.getType());
             row.put("title", m.getTitle());
             row.put("content", m.getContent());
+            row.put("orderId", m.getOrderId());
             row.put("isRead", Integer.valueOf(1).equals(m.getIsRead()));
             row.put("time", m.getCreatedAt() == null ? "" : m.getCreatedAt().format(TIME_FORMAT));
+            rows.add(row);
+        }
+        return Result.ok(rows);
+    }
+
+    /** 最新未读消息（全局悬浮横幅轮询用，最多 3 条，轻量不拉全量） */
+    public Result<List<Map<String, Object>>> latestUnread(Long userId) {
+        List<Message> messages = messageRepository.findTop3ByUserIdAndIsReadOrderByCreatedAtDesc(userId, 0);
+        List<Map<String, Object>> rows = new ArrayList<>();
+        for (Message m : messages) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("id", m.getId());
+            row.put("type", m.getType());
+            row.put("title", m.getTitle());
+            row.put("content", m.getContent());
+            row.put("orderId", m.getOrderId());
+            row.put("time", m.getCreatedAt() == null ? "" : m.getCreatedAt().format(TIME_FORMAT));
+            // 毫秒时间戳：前端据此只弹"本次会话内新产生"的消息，历史未读不连弹横幅
+            row.put("ts", m.getCreatedAt() == null ? 0L
+                    : m.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli());
             rows.add(row);
         }
         return Result.ok(rows);

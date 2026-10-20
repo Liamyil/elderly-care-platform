@@ -15,7 +15,6 @@
       </view>
       <view class="order-line">
         <text class="order-type">{{order.type}}</text>
-        <text class="order-reward">🪙 {{order.reward}}时间币</text>
       </view>
       <text class="order-addr">服务地址：{{order.address}}</text>
       <text wx:if="{{order.time}}" class="order-addr">预约时间：{{order.time}}</text>
@@ -69,3 +68,5 @@
     <view class="submit-btn" bindtap="onSubmit">提交{{kindName}}</view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

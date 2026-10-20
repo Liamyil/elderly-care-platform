@@ -22,8 +22,8 @@ Page({
       role: '',
       isHelper: false,
       timeCoins: 0,
-      serviceCount: 0,
-      evaluationScore: 0
+      rmbSpent: 0,
+      serviceCount: 0
     }
   },
 
@@ -75,9 +75,10 @@ Page({
           // 双重身份共存：拥有互助员身份时显示「切换至接单端」入口（role 兜底兼容旧缓存数据）
           isHelper: !!(globalUserInfo.isHelper || globalUserInfo.role === '互助员'),
           avatar: globalUserInfo.avatar || '',
-          timeCoins: globalUserInfo.timeCoins || 168,
-          serviceCount: globalUserInfo.orders || 12,
-          evaluationScore: globalUserInfo.rating || 4.9
+          timeCoins: globalUserInfo.timeCoins || 0,
+          // 人民币消费累计：来自 /api/user/info 的 rmbSpent（陪诊订单已支付金额合计），0 也固定展示
+          rmbSpent: globalUserInfo.rmbSpent || 0,
+          serviceCount: globalUserInfo.serviceCount || 0
         }
       })
     } else {
@@ -90,8 +91,8 @@ Page({
           role: '',
           isHelper: false,
           timeCoins: 0,
-          serviceCount: 0,
-          evaluationScore: 0
+          rmbSpent: 0,
+          serviceCount: 0
         }
       })
     }
@@ -133,12 +134,6 @@ Page({
     })
   },
 
-  goToOrderList() {
-    wx.switchTab({
-      url: '/pages/order/order'
-    })
-  },
-
   goToAccount() {
     if (!this.data.isLoggedIn) {
       this.setData({ showLogin: true })
@@ -146,12 +141,6 @@ Page({
     }
     wx.navigateTo({
       url: '/pages/account/account'
-    })
-  },
-
-  goToBank() {
-    wx.switchTab({
-      url: '/pages/bank/bank'
     })
   },
 

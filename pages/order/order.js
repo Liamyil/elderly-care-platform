@@ -39,7 +39,9 @@ Page({
       completed: [],
       cancelled: []
     },
-    tabCounts: [0, 0, 0, 0]
+    tabCounts: [0, 0, 0, 0],
+    // 完工通知定位：目标订单卡片滚动锚点（scroll-into-view，定位后 3 秒清空）
+    scrollIntoView: ''
   },
 
   onLoad() {
@@ -73,9 +75,12 @@ Page({
       this.setData({
         currentStatus: 'cancelled',
         currentStatusText: '已取消',
-        currentIndex: 4
+        currentIndex: 3
       })
     }
+
+    // 完工通知点击定位：读取悬浮窗写入的全局标记（消费后立即清空防重复触发）
+    this.handleTargetOrderFlag()
 
     this.loadOrders()
     this.startAutoRefresh()
@@ -83,12 +88,121 @@ Page({
 
   onLoginSuccess() {
     this.setData({ showLogin: false })
+    // 游客被登录弹窗拦截后登录成功：补一次完工通知定位检查
+    this.handleTargetOrderFlag()
     this.loadOrders()
     this.startAutoRefresh()
   },
 
   onLoginClose() {
     this.setData({ showLogin: false })
+  },
+
+  // ===== 完工通知点击定位：悬浮窗写入全局标记 → 订单页切页签 + 滚动定位 + 呼吸灯高亮 =====
+
+  /** 读取悬浮窗写入的全局标记（onShow / 登录成功后调用），消费后立即清空防重复触发 */
+  handleTargetOrderFlag() {
+    var app = getApp()
+    var orderId = app.globalData && app.globalData.targetOrderId
+    if (!orderId) return
+    var tabKey = app.globalData.targetTab || 'serving'
+    app.globalData.targetOrderId = ''
+    app.globalData.targetTab = ''
+    // onShow 流程马上就会 loadOrders，无需额外刷新
+    this.locateTargetOrder(orderId, tabKey, true)
+  },
+
+  /** 定位并高亮指定订单（悬浮窗在当前订单页时直调）：
+   *  切到目标页签 → 挂起定位任务，列表加载渲染完成后自动滚动 + 高亮
+   *  skipReload=true 表示马上就有一次 loadOrders（onShow 流程），无需额外刷新 */
+  locateTargetOrder(orderId, tabKey, skipReload) {
+    var tabs = this.data.statusTabs
+    var index = -1
+    for (var i = 0; i < tabs.length; i++) {
+      if (tabs[i].key === tabKey) { index = i; break }
+    }
+    if (index < 0) {
+      // 非法页签兜底：「服务中」页签（pending_confirm 订单展示页签）
+      tabKey = 'serving'
+      for (var j = 0; j < tabs.length; j++) {
+        if (tabs[j].key === tabKey) { index = j; break }
+      }
+    }
+    this.setData({
+      currentStatus: tabKey,
+      currentStatusText: tabs[index].label,
+      currentIndex: index
+    })
+    this._pendingLocate = { orderId: orderId, tabKey: tabKey }
+    if (!skipReload) {
+      // 静默刷新拿最新状态（如订单刚转待确认），完成后 _afterOrdersLoaded 自动滚动
+      this.loadOrders(true)
+    }
+  },
+
+  /** 列表加载渲染完成后的收尾：有挂起的定位任务则执行（自动刷新时为空操作） */
+  _afterOrdersLoaded() {
+    if (!this._pendingLocate) return
+    var target = this._pendingLocate
+    this._pendingLocate = null
+    this._scrollToTargetOrder(target.orderId, target.tabKey)
+  },
+
+  /** 滚动到目标订单卡片并呼吸灯高亮 3 秒：
+   *  目标页签找不到时跨页签兜底（如已被老人确认 → 已完成页签，自动切过去）；
+   *  滚动必须等渲染完成：setData 回调 + 350ms 延时（覆盖 swiper 300ms 切换动画） */
+  _scrollToTargetOrder(orderId, tabKey) {
+    var that = this
+    var keys = ['pending', 'serving', 'completed', 'cancelled']
+    var orderedKeys = [tabKey].concat(keys.filter(function (k) { return k !== tabKey }))
+    var foundKey = null
+    var foundIndex = -1
+    for (var i = 0; i < orderedKeys.length; i++) {
+      var list = this.data.orders[orderedKeys[i]] || []
+      for (var j = 0; j < list.length; j++) {
+        if (list[j].id === orderId) {
+          foundKey = orderedKeys[i]
+          foundIndex = j
+          break
+        }
+      }
+      if (foundKey) break
+    }
+    if (!foundKey) return // 订单已不存在（已删除等），静默放弃
+
+    // 订单在其他页签（如已完成）：切过去再定位
+    if (foundKey !== this.data.currentStatus) {
+      var tabs = this.data.statusTabs
+      var index = 0
+      for (var t = 0; t < tabs.length; t++) {
+        if (tabs[t].key === foundKey) { index = t; break }
+      }
+      this.setData({
+        currentStatus: foundKey,
+        currentStatusText: tabs[index].label,
+        currentIndex: index
+      })
+    }
+
+    var highlightKey = 'orders.' + foundKey + '[' + foundIndex + '].isHighlight'
+    var patch = {}
+    patch[highlightKey] = true
+    this.setData(patch, function () {
+      // setData 渲染完成后再滚动（延时覆盖 swiper 切换动画，确保目标 scroll-view 已就位）
+      if (that._scrollTimer) clearTimeout(that._scrollTimer)
+      that._scrollTimer = setTimeout(function () {
+        that.setData({ scrollIntoView: 'order-' + orderId })
+      }, 350)
+    })
+
+    // 3 秒后移除高亮与滚动锚点，防止下次进入重复触发
+    if (this._highlightTimer) clearTimeout(this._highlightTimer)
+    this._highlightTimer = setTimeout(function () {
+      var clearPatch = {}
+      clearPatch[highlightKey] = false
+      clearPatch.scrollIntoView = ''
+      that.setData(clearPatch)
+    }, 3000)
   },
 
   loadOrders(silent) {
@@ -147,6 +261,8 @@ Page({
       })
 
       that.setData({ orders: orders, tabCounts: counts })
+      // 列表渲染完成收尾：有挂起的完工通知定位任务则执行滚动 + 高亮
+      that._afterOrdersLoaded()
       if (!silent) {
         wx.showToast({
           title: '加载成功',
@@ -191,6 +307,10 @@ Page({
 
   onUnload() {
     this.stopAutoRefresh()
+    if (this._scrollTimer) clearTimeout(this._scrollTimer)
+    if (this._highlightTimer) clearTimeout(this._highlightTimer)
+    this._scrollTimer = null
+    this._highlightTimer = null
   },
 
   onStatusTabClick(e) {
@@ -276,10 +396,12 @@ Page({
     })
   },
 
-  onContactHelper(e) {
-    wx.showToast({
-      title: '联系TA功能开发中',
-      icon: 'none'
+  /** 卡片点击 → 订单详情页（时间轴 + 双方联系方式） */
+  goOrderDetail(e) {
+    var orderId = e.currentTarget.dataset.id
+    if (!orderId) return
+    wx.navigateTo({
+      url: '/pages/order-detail/order-detail?id=' + orderId
     })
   },
 

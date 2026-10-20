@@ -74,6 +74,10 @@ public class HelperApplicationService {
         if (realName.isBlank() || phone.isBlank() || age == null || gender.isBlank()) {
             return Result.error(400, "请完整填写姓名、手机号、年龄与性别");
         }
+        // 姓名强校验（防绕过前端提交乱码）：仅中文/英文字母，2-20 位
+        if (!realName.matches("[a-zA-Z\\u4e00-\\u9fa5]{2,20}")) {
+            return Result.error(400, "请输入真实的姓名（仅限中英文字母）");
+        }
         if (age < 18 || age > 70) {
             return Result.error(400, "请输入18-70岁之间的年龄");
         }

@@ -42,6 +42,10 @@ public class Transaction {
     @Column(name = "rmb_amount")
     private BigDecimal rmbAmount;
 
+    /** 关联订单号（订单资金流水溯源：冻结/退款/结算可回写同一订单的流水） */
+    @Column(name = "order_id", length = 50)
+    private String orderId;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -99,6 +103,14 @@ public class Transaction {
 
     public void setRmbAmount(BigDecimal rmbAmount) {
         this.rmbAmount = rmbAmount;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public LocalDateTime getCreatedAt() {

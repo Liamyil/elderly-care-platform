@@ -79,6 +79,8 @@ Component({
     /** 登录完成：通知页面并关闭；互助员按本地缓存的工作模式决定进入哪个端（双重身份共存） */
     finishLogin() {
       wx.showToast({ title: '登录成功', icon: 'success', duration: 1500 })
+      // 站内信闭环：登录成功后启动未读消息轮询（未登录期间 onShow 已跳过）
+      app.startMessagePolling()
       this.triggerEvent('success', { user: app.globalData.userInfo })
       const role = app.globalData.userInfo && app.globalData.userInfo.role
       if (role === '互助员') {

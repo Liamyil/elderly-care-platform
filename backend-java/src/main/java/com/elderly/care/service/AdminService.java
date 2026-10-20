@@ -227,6 +227,14 @@ public class AdminService {
 
     /** 互助员列表（指派下拉框用）；民政管理员查看时手机号脱敏 */
     public Result<List<Map<String, Object>>> helpers(boolean maskPhone) {
+        Map<Long, Long> asUser = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByUser()) {
+            asUser.put((Long) row[0], (Long) row[1]);
+        }
+        Map<Long, Long> asHelper = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByHelper()) {
+            asHelper.put((Long) row[0], (Long) row[1]);
+        }
         List<Map<String, Object>> rows = new ArrayList<>();
         for (User u : userRepository.findByRoleOrderByIdAsc("互助员")) {
             Map<String, Object> row = new LinkedHashMap<>();
@@ -235,7 +243,8 @@ public class AdminService {
             row.put("phone", maskPhone ? PhoneMaskUtil.mask(u.getPhone()) : u.getPhone());
             row.put("timeCoins", u.getTimeCoins());
             row.put("rmbBalance", u.getRmbBalance());
-            row.put("serviceCount", u.getServiceCount());
+            // 实时统计该用户参与的已完成订单数（下单 + 接单，替代存量 service_count 列）
+            row.put("serviceCount", (int) (asUser.getOrDefault(u.getId(), 0L) + asHelper.getOrDefault(u.getId(), 0L)));
             rows.add(row);
         }
         return Result.ok(rows);
@@ -244,6 +253,14 @@ public class AdminService {
     /** 用户列表（H5 用户管理，简单关键词过滤）；民政管理员查看时手机号脱敏 */
     public Result<List<Map<String, Object>>> users(String keyword, boolean maskPhone) {
         String kw = keyword == null ? "" : keyword.trim();
+        Map<Long, Long> asUser = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByUser()) {
+            asUser.put((Long) row[0], (Long) row[1]);
+        }
+        Map<Long, Long> asHelper = new HashMap<>();
+        for (Object[] row : orderRepository.countCompletedGroupByHelper()) {
+            asHelper.put((Long) row[0], (Long) row[1]);
+        }
         List<Map<String, Object>> rows = new ArrayList<>();
         for (User u : userRepository.findAll()) {
             if (!kw.isEmpty()
@@ -261,7 +278,8 @@ public class AdminService {
             row.put("status", u.getStatus());
             row.put("timeCoins", u.getTimeCoins());
             row.put("rmbBalance", u.getRmbBalance());
-            row.put("serviceCount", u.getServiceCount());
+            // 实时统计该用户参与的已完成订单数（下单 + 接单，替代存量 service_count 列）
+            row.put("serviceCount", (int) (asUser.getOrDefault(u.getId(), 0L) + asHelper.getOrDefault(u.getId(), 0L)));
             row.put("createdAt", u.getCreatedAt() == null ? "" : u.getCreatedAt().format(FMT));
             rows.add(row);
         }
@@ -285,7 +303,7 @@ public class AdminService {
             order.setStatusKey("pending");
             orderRepository.save(order);
             insertMessage(order.getUserId(), "order", "订单审核通过",
-                    "您的" + order.getType() + "订单已通过审核，等待互助员接单");
+                    "您的" + order.getType() + "订单已通过审核，等待互助员接单", order.getId());
             return Result.ok("审核通过", null);
         } else {
             String rejectReason = (reason == null || reason.isBlank()) ? "审核未通过" : ("审核未通过：" + reason);
@@ -295,7 +313,7 @@ public class AdminService {
             order.setCancelTime(LocalDateTime.now());
             orderRepository.save(order);
             insertMessage(order.getUserId(), "order", "订单未通过审核",
-                    "您的" + order.getType() + "订单未通过审核，原因：" + rejectReason);
+                    "您的" + order.getType() + "订单未通过审核，原因：" + rejectReason, order.getId());
             return Result.ok("已驳回", null);
         }
     }
@@ -329,9 +347,9 @@ public class AdminService {
         orderRepository.save(order);
 
         insertMessage(order.getUserId(), "order", "订单已指派",
-                "您的" + order.getType() + "订单已由社区指派互助员" + helper.getName());
+                "您的" + order.getType() + "订单已由社区指派互助员" + helper.getName(), order.getId());
         insertMessage(helperId, "order", "社区指派新订单",
-                "社区为您指派了" + order.getType() + "订单，请按时上门服务");
+                "社区为您指派了" + order.getType() + "订单，请按时上门服务", order.getId());
 
         // 关键节点通知：订阅消息 + 短信兜底
         Map<String, String> data = new LinkedHashMap<>();
@@ -343,7 +361,7 @@ public class AdminService {
         return Result.ok("指派成功", null);
     }
 
-    /** 管理员取消订单（兜底处理异常订单）：待接单阶段取消自动退回冻结资金；服务中取消冻结待人工退款裁决 */
+    /** 管理员取消订单（兜底处理异常订单）：取消即退回冻结资金（refunded 幂等防重，人工退款接口保留作兜底） */
     @Transactional
     public Result<Void> cancel(String orderId, String reason) {
         Order order = orderRepository.findByIdForUpdate(orderId).orElse(null);
@@ -353,22 +371,19 @@ public class AdminService {
         if ("completed".equals(order.getStatusKey()) || "cancelled".equals(order.getStatusKey())) {
             return Result.error(400, "当前状态无法取消");
         }
-        String statusKey = order.getStatusKey();
 
         String cancelReason = (reason == null || reason.isBlank()) ? "管理员取消" : ("管理员取消：" + reason);
         order.setStatus("已取消");
         order.setStatusKey("cancelled");
         order.setCancelReason(cancelReason);
         order.setCancelTime(LocalDateTime.now());
-        // 待接单阶段取消自动退款；服务中/待确认取消资金冻结待管理员裁决（人工退款接口）
-        if (!"serving".equals(statusKey) && !"pending_confirm".equals(statusKey)) {
-            fundService.refundOnCancel(order);
-        }
+        // 取消即退回冻结资金（2026-10-19 调整：与用户取消一致，不再冻结待人工裁决）
+        fundService.refundOnCancel(order);
         orderRepository.save(order);
 
-        insertMessage(order.getUserId(), "order", "订单已取消", "您的" + order.getType() + "订单已被取消，原因：" + cancelReason);
+        insertMessage(order.getUserId(), "order", "订单已取消", "您的" + order.getType() + "订单已被取消，原因：" + cancelReason, order.getId());
         if (order.getHelperId() != null) {
-            insertMessage(order.getHelperId(), "order", "订单已取消", order.getType() + "订单已被取消，原因：" + cancelReason);
+            insertMessage(order.getHelperId(), "order", "订单已取消", order.getType() + "订单已被取消，原因：" + cancelReason, order.getId());
         }
         return Result.ok("取消成功", null);
     }
@@ -405,7 +420,7 @@ public class AdminService {
         operationLogService.record(operatorId, OperationLog.TYPE_MANUAL_REFUND, before, snapshotJson(order), reason.trim());
 
         insertMessage(order.getUserId(), "order", "订单资金已退回",
-                "您的" + order.getType() + "订单冻结资金已由管理员退回，原因：" + reason.trim());
+                "您的" + order.getType() + "订单冻结资金已由管理员退回，原因：" + reason.trim(), order.getId());
         return Result.ok("已退款并留痕", null);
     }
 
@@ -519,8 +534,7 @@ public class AdminService {
         return Result.ok(status == 1 ? "账号已启用" : "账号已禁用", null);
     }
 
-    /** 强制取消订单（民政管理员紧急干预，高危动作）：原因必填 + 操作日志留痕；
-     *  待接单阶段取消自动退回冻结资金；服务中/待确认取消资金冻结待人工退款裁决 */
+    /** 强制取消订单（民政管理员紧急干预，高危动作）：原因必填 + 操作日志留痕；取消即退回冻结资金 */
     @Transactional
     public Result<Void> forceCancel(Long operatorId, String orderId, String reason) {
         if (reason == null || reason.isBlank()) {
@@ -533,25 +547,22 @@ public class AdminService {
         if ("completed".equals(order.getStatusKey()) || "cancelled".equals(order.getStatusKey())) {
             return Result.error(400, "当前状态无法取消");
         }
-        String statusKey = order.getStatusKey();
         String before = snapshotJson(order);
         String cancelReason = "紧急干预取消：" + reason.trim();
         order.setStatus("已取消");
         order.setStatusKey("cancelled");
         order.setCancelReason(cancelReason);
         order.setCancelTime(LocalDateTime.now());
-        // 待接单阶段取消自动退款；服务中/待确认取消资金冻结待管理员裁决（人工退款接口）
-        if (!"serving".equals(statusKey) && !"pending_confirm".equals(statusKey)) {
-            fundService.refundOnCancel(order);
-        }
+        // 取消即退回冻结资金（2026-10-19 调整：与用户取消一致，不再冻结待人工裁决）
+        fundService.refundOnCancel(order);
         orderRepository.save(order);
 
         operationLogService.record(operatorId, OperationLog.TYPE_FORCE_CANCEL, before, snapshotJson(order), reason.trim());
         insertMessage(order.getUserId(), "order", "订单已被紧急取消",
-                "您的" + order.getType() + "订单已被紧急干预取消，原因：" + cancelReason);
+                "您的" + order.getType() + "订单已被紧急干预取消，原因：" + cancelReason, order.getId());
         if (order.getHelperId() != null) {
             insertMessage(order.getHelperId(), "order", "订单已被紧急取消",
-                    order.getType() + "订单已被紧急干预取消，原因：" + cancelReason);
+                    order.getType() + "订单已被紧急干预取消，原因：" + cancelReason, order.getId());
         }
         return Result.ok("已强制取消并留痕", null);
     }
@@ -592,9 +603,9 @@ public class AdminService {
 
         operationLogService.record(operatorId, OperationLog.TYPE_FORCE_ASSIGN, before, snapshotJson(order), reason.trim());
         insertMessage(order.getUserId(), "order", "订单已紧急指派",
-                "您的" + order.getType() + "订单已由紧急干预指派互助员" + helper.getName());
+                "您的" + order.getType() + "订单已由紧急干预指派互助员" + helper.getName(), order.getId());
         insertMessage(helperId, "order", "社区紧急指派新订单",
-                "社区为您紧急指派了" + order.getType() + "订单，请按时上门服务");
+                "社区为您紧急指派了" + order.getType() + "订单，请按时上门服务", order.getId());
 
         // 关键节点通知：订阅消息 + 短信兜底
         Map<String, String> data = new LinkedHashMap<>();
@@ -733,16 +744,25 @@ public class AdminService {
         return row;
     }
 
+    /** 消息 ID 自增序列：同一毫秒连发多条消息（如取消通知双方）时保证主键唯一 */
+    private static final java.util.concurrent.atomic.AtomicLong MSG_SEQ = new java.util.concurrent.atomic.AtomicLong(0);
+
     private void insertMessage(Long userId, String type, String title, String content) {
+        insertMessage(userId, type, title, content, null);
+    }
+
+    /** 插入站内消息（带关联订单号，点击跳转订单详情） */
+    private void insertMessage(Long userId, String type, String title, String content, String orderId) {
         if (userId == null) {
             return;
         }
         Message msg = new Message();
-        msg.setId("MSG" + System.currentTimeMillis());
+        msg.setId("MSG" + System.currentTimeMillis() + "_" + MSG_SEQ.incrementAndGet());
         msg.setUserId(userId);
         msg.setType(type);
         msg.setTitle(title);
         msg.setContent(content);
+        msg.setOrderId(orderId);
         msg.setIsRead(0);
         messageRepository.save(msg);
     }

@@ -52,6 +52,7 @@ public class SuperAdminInitializer implements ApplicationRunner {
         backfillHelperFlag();
         ensureFundColumns();
         ensureWithdrawalsTable();
+        ensureMessageColumns();
         Long superAdminId = ensureSuperAdmin();
         seedDefaultConfigs(superAdminId);
     }
@@ -147,6 +148,8 @@ public class SuperAdminInitializer implements ApplicationRunner {
                 "ALTER TABLE transactions ADD COLUMN asset_type VARCHAR(20) DEFAULT 'time_coin' COMMENT '币种：time_coin/rmb'");
         ensureColumn("transactions", "rmb_amount",
                 "ALTER TABLE transactions ADD COLUMN rmb_amount DECIMAL(10,2) DEFAULT NULL COMMENT '人民币流水金额（asset_type=rmb 时使用）'");
+        ensureColumn("transactions", "order_id",
+                "ALTER TABLE transactions ADD COLUMN order_id VARCHAR(50) DEFAULT NULL COMMENT '关联订单号（资金流水溯源）'");
         ensureColumn("orders", "asset_type",
                 "ALTER TABLE orders ADD COLUMN asset_type VARCHAR(20) DEFAULT NULL COMMENT '结算币种：time_coin/rmb（null 为历史订单）'");
         ensureColumn("orders", "rmb_amount",
@@ -161,6 +164,12 @@ public class SuperAdminInitializer implements ApplicationRunner {
                 "ALTER TABLE orders ADD COLUMN refunded INT DEFAULT 0 COMMENT '是否已退款给下单人 0/1'");
         ensureColumn("orders", "hours",
                 "ALTER TABLE orders ADD COLUMN hours INT DEFAULT NULL COMMENT '服务时长（小时），互助类 1小时=1时间币'");
+    }
+
+    /** messages 表补 order_id 列（站内信闭环：点击消息跳转关联订单详情） */
+    private void ensureMessageColumns() {
+        ensureColumn("messages", "order_id",
+                "ALTER TABLE messages ADD COLUMN order_id VARCHAR(50) DEFAULT NULL COMMENT '关联订单号（点击消息跳转订单详情）'");
     }
 
     /** 幂等建表：人民币提现申请表（资金双轨制） */

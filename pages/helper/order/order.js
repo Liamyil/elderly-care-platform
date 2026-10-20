@@ -151,8 +151,13 @@ Page({
     }
   },
 
-  onContactHelper(e) {
-    wx.showToast({ title: '联系TA功能开发中', icon: 'none' })
+  /** 卡片点击 → 订单详情页（时间轴 + 老人联系方式） */
+  goOrderDetail(e) {
+    var orderId = e.currentTarget.dataset.id
+    if (!orderId) return
+    wx.navigateTo({
+      url: '/pages/order-detail/order-detail?id=' + orderId
+    })
   },
 
   onGoTrace(e) {

@@ -8,10 +8,16 @@
   </view>
 
   <view class="nav-content">
+    <!-- 分类 Tab：全部 / 订单动态 -->
+    <view class="message-tabs">
+      <view class="message-tab {{activeTab === 'all' ? 'active' : ''}}" data-tab="all" bindtap="switchTab">全部</view>
+      <view class="message-tab {{activeTab === 'order' ? 'active' : ''}}" data-tab="order" bindtap="switchTab">订单动态</view>
+    </view>
+
     <view class="message-list">
-      <view 
-        wx:for="{{filteredMessages}}" 
-        wx:key="id" 
+      <view
+        wx:for="{{filteredMessages}}"
+        wx:key="id"
         class="message-item {{item.isRead ? 'read' : 'unread'}}"
         bindtap="onMessageClick"
         data-id="{{item.id}}"
@@ -25,7 +31,10 @@
             <view wx:if="{{!item.isRead}}" class="message-dot"></view>
           </view>
           <text class="message-desc">{{item.content}}</text>
-          <text class="message-time">{{item.time}}</text>
+          <view class="message-bottom-row">
+            <text class="message-time">{{item.time}}</text>
+            <text wx:if="{{item.orderId}}" class="message-jump">查看订单 ›</text>
+          </view>
         </view>
       </view>
 
@@ -37,3 +46,5 @@
     </view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

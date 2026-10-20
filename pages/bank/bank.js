@@ -4,7 +4,6 @@ Page({
   data: {
     statusBarHeight: 0,
     balance: 0,
-    totalEarned: 0,
     totalRedeemed: 0,
     iconExists: {
       service: false,
@@ -22,13 +21,14 @@ Page({
     this.setData({
       statusBarHeight: systemInfo.statusBarHeight
     })
-    this.loadBankData()
   },
 
   onShow() {
-    // 游客进入时间银行页 → 弹出登录提示
+    // 游客进入时间银行页 → 弹出登录提示；已登录 → 每次进入都刷新余额与流水
     if (!wx.getStorageSync('token')) {
       this.setData({ showLogin: true })
+    } else {
+      this.loadBankData()
     }
   },
 
@@ -48,7 +48,6 @@ Page({
 
       this.setData({
         balance: balanceData.balance,
-        totalEarned: balanceData.totalEarned,
         totalRedeemed: balanceData.totalRedeemed,
         transactions: transactionsData.list,
         recentTransactions: transactionsData.list.slice(0, 5)

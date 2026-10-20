@@ -1,5 +1,6 @@
 package com.elderly.care.service;
 
+import com.elderly.care.common.PhoneMaskUtil;
 import com.elderly.care.common.Result;
 import com.elderly.care.config.AppConfig;
 import com.elderly.care.entity.Message;
@@ -79,7 +80,7 @@ public class OrderService {
 
     // ==================== 查询类 ====================
 
-    /** 首页数据：公告 + 附近待接单订单 + 用户信息（公告和用户信息为原版占位数据） */
+    /** 首页数据：公告 + 附近待接单订单 + 用户信息（公告为占位数据，用户信息取真实值） */
     public Result<Map<String, Object>> home(Long uid) {
         List<Map<String, Object>> notices = new ArrayList<>();
         Map<String, Object> n1 = new LinkedHashMap<>();
@@ -95,9 +96,11 @@ public class OrderService {
         notices.add(n1);
         notices.add(n2);
 
+        // 用户信息取真实值（原为硬编码占位）：余额 + 实时统计的已完成订单数
+        User u = userRepository.findById(uid).orElse(null);
         Map<String, Object> userInfo = new LinkedHashMap<>();
-        userInfo.put("timeCoins", 150);
-        userInfo.put("serviceCount", 8);
+        userInfo.put("timeCoins", u == null || u.getTimeCoins() == null ? 0 : u.getTimeCoins());
+        userInfo.put("serviceCount", u == null ? 0 : (int) orderRepository.countCompletedByUser(u.getId()));
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("notices", notices);
@@ -164,7 +167,7 @@ public class OrderService {
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("type", o.getType());
             row.put("helper", o.getHelper());
-            row.put("rating", o.getRating() == null ? 5 : o.getRating());
+            row.put("rating", o.getRating());
             row.put("comment", o.getComment());
             row.put("serviceTime", o.getServiceTime());
             rows.add(row);
@@ -178,19 +181,40 @@ public class OrderService {
                 ? orderRepository.findMine(uid)
                 : orderRepository.findMineByStatus(uid, status);
 
+        // 下单人姓名批量查询（互助员端卡片「下单人：XX」展示用，纯返回字段）
+        Map<Long, String> nameMap = new HashMap<>();
+        for (Order o : orders) {
+            nameMap.putIfAbsent(o.getUserId(), null);
+        }
+        if (!nameMap.isEmpty()) {
+            for (User u : userRepository.findAllById(nameMap.keySet())) {
+                nameMap.put(u.getId(), u.getName());
+            }
+        }
+
         List<Map<String, Object>> rows = new ArrayList<>();
         for (Order o : orders) {
-            rows.add(toMineMap(o, uid));
+            rows.add(toMineMap(o, uid, nameMap));
         }
         return Result.ok(rows);
     }
 
-    /** 订单详情 */
-    public Result<Map<String, Object>> detail(String orderId) {
+    /** 订单详情：按查看人身份下发时间轴与双方联系方式。
+     *  防泄露红线：老人姓名/电话仅接单互助员可见；互助员电话仅下单人可见；
+     *  未接单/已取消/非当事方一律不下发完整信息（姓名脱敏、电话置空）。 */
+    public Result<Map<String, Object>> detail(Long uid, String orderId) {
         Order o = orderRepository.findById(orderId).orElse(null);
-        if (o == null) {
+        if (o == null || Integer.valueOf(1).equals(o.getIsDeleted())) {
             return Result.error(404, "订单不存在");
         }
+
+        boolean isCreator = uid != null && uid.equals(o.getUserId());
+        boolean accepted = o.getHelperId() != null;
+        boolean isAssignedHelper = accepted && uid != null && uid.equals(o.getHelperId());
+        boolean contactAllowed = accepted && !"cancelled".equals(o.getStatusKey());
+
+        User elderUser = userRepository.findById(o.getUserId()).orElse(null);
+        User helperUser = accepted ? userRepository.findById(o.getHelperId()).orElse(null) : null;
 
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("id", o.getId());
@@ -214,7 +238,10 @@ public class OrderService {
         row.put("evaluated", Integer.valueOf(1).equals(o.getEvaluated()));
         row.put("rating", o.getRating());
         row.put("comment", o.getComment());
+        // 时间轴：发单 / 接单 / 服务完成（有值才下发，前端按非空渲染）
         row.put("publishTime", formatDateTime(o.getCreatedAt()));
+        row.put("acceptedAt", formatDateTime(o.getAcceptedAt()));
+        row.put("completedAt", formatDateTime(o.getCompletedAt()));
         LocalDateTime cancelTime = o.getCancelTime() != null
                 ? o.getCancelTime()
                 : ("cancelled".equals(o.getStatusKey()) ? o.getUpdatedAt() : null);
@@ -224,6 +251,20 @@ public class OrderService {
         row.put("patientAge", o.getPatientAge());
         row.put("tasks", parseStringList(o.getTasks()));
         row.put("assessment", parseJsonMap(o.getAssessment()));
+        // 双方联系方式（仅当事方可见，见方法注释的防泄露规则）
+        String elderName = elderUser != null && !elderUser.getName().isBlank()
+                ? elderUser.getName() : "用户" + o.getUserId();
+        String helperName = o.getHelper() != null && !o.getHelper().isBlank()
+                ? o.getHelper()
+                : (helperUser != null && !helperUser.getName().isBlank() ? helperUser.getName() : "互助员");
+        row.put("elderName", contactAllowed && isAssignedHelper ? elderName : PhoneMaskUtil.maskName(elderName));
+        row.put("elderPhone", contactAllowed && isAssignedHelper && elderUser != null && elderUser.getPhone() != null
+                ? elderUser.getPhone() : "");
+        row.put("helperName", contactAllowed ? helperName : "");
+        row.put("helperPhone", contactAllowed && isCreator && helperUser != null && helperUser.getPhone() != null
+                ? helperUser.getPhone() : "");
+        row.put("isCreator", isCreator);
+        row.put("isAssignedHelper", isAssignedHelper);
         return Result.ok(row);
     }
 
@@ -313,7 +354,7 @@ public class OrderService {
             order.setStatus("待支付");
             order.setStatusKey(OrderFundService.STATUS_PENDING_PAY);
             orderRepository.save(order);
-            insertMessage(uid, "order", "订单已提交", "您的" + type + "订单已提交，请完成支付");
+            insertMessage(uid, "order", "订单已提交", "您的" + type + "订单已提交，请完成支付", order.getId());
         } else {
             // ===== 互助类：1小时=1时间币，发单即冻结（余额即可用余额） =====
             // 服务时长必选（老前端未传时长时兼容 reward 字段取值）
@@ -331,11 +372,11 @@ public class OrderService {
             order.setStatus("待接单");
             order.setStatusKey("pending");
             // 发单即冻结时间币（先冻结后落库：余额不足直接拒绝，未写库无需回滚）
-            if (!fundService.freezeCoins(uid, hoursVal, type)) {
+            if (!fundService.freezeCoins(uid, hoursVal, type, order.getId())) {
                 return Result.error(400, "时间币不足，当前余额无法支付该订单");
             }
             orderRepository.save(order);
-            insertMessage(uid, "order", "订单已提交", "您的" + type + "订单已提交并冻结" + hoursVal + "时间币，等待互助员接单");
+            insertMessage(uid, "order", "订单已提交", "您的" + type + "订单已提交并冻结" + hoursVal + "时间币，等待互助员接单", order.getId());
         }
 
         Map<String, Object> data = new LinkedHashMap<>();
@@ -370,7 +411,7 @@ public class OrderService {
         order.setStatus("待接单");
         order.setStatusKey("pending");
         orderRepository.save(order);
-        insertMessage(uid, "order", "支付成功", "您的" + order.getType() + "订单支付成功（模拟支付），等待互助员接单");
+        insertMessage(uid, "order", "支付成功", "您的" + order.getType() + "订单支付成功（模拟支付），等待互助员接单", order.getId());
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("mock", true);
@@ -406,12 +447,15 @@ public class OrderService {
 
         order.setStatus("服务中");
         order.setStatusKey("serving");
-        order.setHelper(helper.getName() == null || helper.getName().isBlank() ? "互助员" : helper.getName());
+        String helperName = helper.getName() == null || helper.getName().isBlank() ? "互助员" : helper.getName();
+        order.setHelper(helperName);
         order.setHelperId(uid);
         order.setAcceptedAt(LocalDateTime.now());
         orderRepository.save(order);
 
-        insertMessage(order.getUserId(), "order", "订单已接单", "您的" + order.getType() + "订单已被互助员接单");
+        // 站内信闭环：接单 → 通知发单老人（带关联订单号，点击跳转订单详情）
+        insertMessage(order.getUserId(), "order", "订单已接单",
+                "互助员" + helperName + "已接单，请保持电话畅通。", order.getId());
         return Result.ok("接单成功", null);
     }
 
@@ -456,16 +500,24 @@ public class OrderService {
 
         order.setStatus("服务中");
         order.setStatusKey("serving");
-        order.setHelper(helper.getName() == null || helper.getName().isBlank() ? "互助员" : helper.getName());
+        String helperName = helper.getName() == null || helper.getName().isBlank() ? "互助员" : helper.getName();
+        order.setHelper(helperName);
         order.setHelperId(uid);
         order.setAcceptedAt(LocalDateTime.now());
         orderRepository.save(order);
+
+        // 站内信闭环：抢单与接单同属"互助员接单"，同样通知发单老人
+        insertMessage(order.getUserId(), "order", "订单已接单",
+                "互助员" + helperName + "已接单，请保持电话畅通。", order.getId());
         return Result.ok("抢单成功", null);
     }
 
     /**
      * 取消订单（仅发布人，待接单/待支付/服务中可取消）。
-     * 资金规则（双轨制）：待接单阶段取消 → 自动退回冻结资金；服务中取消 → 资金冻结，由管理员裁决人工退款。
+     * 资金规则（双轨制）：取消即自动退回冻结资金——时间币退回下单人余额并记退款流水，
+     * 人民币已支付标记原路退款（refunded 幂等防重）。
+     * 2026-10-19 产品调整：服务中取消同样自动退款（原「冻结待管理员人工裁决」在演示期无 UI 入口，
+     * 资金会永久冻结；人工退款接口保留作兜底）。
      */
     @Transactional
     public Result<Void> cancel(Long uid, String orderId, String reason) {
@@ -485,17 +537,24 @@ public class OrderService {
             return Result.error(400, "取消原因选择不正确");
         }
 
+        int frozenBefore = order.getFrozenCoins() == null ? 0 : order.getFrozenCoins();
         order.setStatus("已取消");
         order.setStatusKey("cancelled");
         order.setCancelReason(reason);
         order.setCancelTime(LocalDateTime.now());
-        // 待接单阶段取消自动退款；服务中取消资金冻结待管理员裁决（/api/admin/orders/{id}/refund）
-        if (!"serving".equals(statusKey)) {
-            fundService.refundOnCancel(order);
-        }
+        // 取消即退回冻结资金（任何可取消状态一律退款，refunded 幂等防重）
+        fundService.refundOnCancel(order);
         orderRepository.save(order);
 
-        insertMessage(uid, "order", "订单已取消", "订单因\"" + reason + "\"已取消");
+        String refundTip = (frozenBefore > 0 && OrderFundService.ASSET_TIME_COIN.equals(order.getAssetType()))
+                ? "，冻结的" + frozenBefore + "时间币已退回" : "";
+        // 站内信闭环：取消/退款 → 通知双方（下单人退款提示 + 互助员取消告知）
+        insertMessage(uid, "order", "订单已取消",
+                "订单[" + order.getId() + "]因\"" + reason + "\"已取消" + refundTip, order.getId());
+        if (order.getHelperId() != null) {
+            insertMessage(order.getHelperId(), "order", "订单已取消",
+                    "订单[" + order.getId() + "]已被下单人取消，原因：" + reason + "。", order.getId());
+        }
         return Result.ok("订单已取消", null);
     }
 
@@ -534,7 +593,9 @@ public class OrderService {
         order.setStatusKey("pending_confirm");
         orderRepository.save(order);
 
-        insertMessage(order.getUserId(), "order", "服务已完成", "互助员已完成您的" + order.getType() + "服务，请确认");
+        // 站内信闭环：互助员完工（完工打卡为前置，此处完成服务）→ 通知老人确认
+        insertMessage(order.getUserId(), "order", "服务已完成",
+                "互助员已完成服务，请确认。", order.getId());
         return Result.ok("服务已完成，等待对方确认", null);
     }
 
@@ -560,7 +621,7 @@ public class OrderService {
         }
         // 时间币订单：追加部分先冻结扣余额，不足则拒绝
         if (OrderFundService.ASSET_TIME_COIN.equals(order.getAssetType())
-                && !fundService.freezeCoins(uid, addAmount, order.getType())) {
+                && !fundService.freezeCoins(uid, addAmount, order.getType(), order.getId())) {
             return Result.error(400, "时间币不足，无法追加");
         }
 
@@ -649,8 +710,10 @@ public class OrderService {
         orderRepository.save(order);
 
         if (helperId != null) {
-            insertMessage(helperId, "order", "订单已完成",
-                    "您的" + order.getType() + "订单已完成" + (settleDesc == null ? "" : "，" + settleDesc));
+            // 站内信闭环：老人确认完成（资金结算）→ 通知互助员报酬入账
+            insertMessage(helperId, "order", "资金已结算",
+                    "订单[" + order.getId() + "]已结算，报酬已存入您的账户"
+                            + (settleDesc == null ? "。" : "，" + settleDesc + "。"), order.getId());
 
             if (settleDesc != null) {
                 // 订阅消息：结算到账提醒互助员
@@ -823,15 +886,17 @@ public class OrderService {
             row.put("remark", o.getRemark());
             row.put("images", parseImages(o.getImages()).stream().map(this::fixImageUrl).toList());
             String name = nameMap.get(o.getUserId());
-            row.put("userNickname", name == null || name.isBlank() ? "用户" + o.getUserId() : name);
+            // 防泄露：抢单大厅未接单订单，发布人姓名脱敏展示（电话本就不下发）
+            String nickname = name == null || name.isBlank() ? "用户" + o.getUserId() : name;
+            row.put("userNickname", PhoneMaskUtil.maskName(nickname));
             row.put("publishTime", formatDateTime(o.getCreatedAt()));
             rows.add(row);
         }
         return rows;
     }
 
-    /** 我的订单响应结构（含 isHelper / originalReward / extraReward） */
-    private Map<String, Object> toMineMap(Order o, Long uid) {
+    /** 我的订单响应结构（含 isHelper / originalReward / extraReward / elderName） */
+    private Map<String, Object> toMineMap(Order o, Long uid, Map<Long, String> nameMap) {
         int original = o.getOriginalReward() == null
                 ? (o.getReward() == null ? 0 : o.getReward())
                 : o.getOriginalReward();
@@ -849,6 +914,8 @@ public class OrderService {
         row.put("statusKey", o.getStatusKey());
         row.put("helper", o.getHelper());
         row.put("isHelper", o.getHelperId() != null && o.getHelperId().equals(uid));
+        String elderName = nameMap.get(o.getUserId());
+        row.put("elderName", elderName == null || elderName.isBlank() ? "用户" + o.getUserId() : elderName);
         row.put("subType", o.getSubType());
         row.put("priceText", o.getPriceText());
         row.put("assetType", o.getAssetType());
@@ -877,17 +944,26 @@ public class OrderService {
         return row;
     }
 
+    /** 消息 ID 自增序列：同一毫秒连发多条消息（如取消通知双方）时保证主键唯一 */
+    private static final java.util.concurrent.atomic.AtomicLong MSG_SEQ = new java.util.concurrent.atomic.AtomicLong(0);
+
     /** 插入站内消息 */
     private void insertMessage(Long userId, String type, String title, String content) {
+        insertMessage(userId, type, title, content, null);
+    }
+
+    /** 插入站内消息（带关联订单号，点击跳转订单详情） */
+    private void insertMessage(Long userId, String type, String title, String content, String orderId) {
         if (userId == null) {
             return;
         }
         Message msg = new Message();
-        msg.setId("MSG" + System.currentTimeMillis());
+        msg.setId("MSG" + System.currentTimeMillis() + "_" + MSG_SEQ.incrementAndGet());
         msg.setUserId(userId);
         msg.setType(type);
         msg.setTitle(title);
         msg.setContent(content);
+        msg.setOrderId(orderId);
         msg.setIsRead(0);
         messageRepository.save(msg);
     }

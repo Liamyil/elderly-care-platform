@@ -92,7 +92,7 @@
   align-items: center;
   background-color: #ffffff;
   margin: 20rpx 24rpx 20rpx;
-  padding: 40rpx 24rpx;
+  padding: 32rpx 16rpx;
   border-radius: 16rpx;
   box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
   position: relative;
@@ -102,26 +102,24 @@
 .stat-item {
   flex: 1;
   text-align: center;
+  padding: 0 8rpx;
+  min-width: 0;
 }
 
 .stat-value {
-  font-size: 56rpx;
+  font-size: 44rpx;
   color: #2D7D46;
   font-weight: bold;
   display: block;
+  white-space: nowrap;
 }
 
 .stat-label {
-  font-size: 28rpx;
+  font-size: 22rpx;
   color: #666666;
   display: block;
-  margin-top: 16rpx;
-}
-
-.stat-divider {
-  width: 1rpx;
-  height: 80rpx;
-  background-color: #F0F0F0;
+  margin-top: 10rpx;
+  white-space: nowrap;
 }
 
 .menu-list {

@@ -95,12 +95,6 @@
   color: #333333;
 }
 
-.order-reward {
-  font-size: 28rpx;
-  color: #E8852E;
-  font-weight: bold;
-}
-
 .order-addr {
   display: block;
   margin-top: 14rpx;

@@ -26,11 +26,13 @@
     >
       <swiper-item wx:for="{{statusTabs}}" wx:key="key" class="swiper-item">
         <scroll-view scroll-y class="order-list" show-scrollbar="{{false}}">
-          <view 
-            wx:for="{{orders[item.key]}}" 
+          <view
+            wx:for="{{orders[item.key]}}"
             wx:for-item="order"
             wx:key="id"
             class="order-card"
+            bindtap="goOrderDetail"
+            data-id="{{order.id}}"
           >
             <view class="order-header">
               <text class="order-no">订单号：{{order.id}}</text>
@@ -51,6 +53,11 @@
               <view class="order-time-row">
                 <text class="time-label">预约时间：</text>
                 <text class="order-time">{{order.time}}</text>
+              </view>
+
+              <view wx:if="{{order.elderName && (order.statusKey === 'serving' || order.statusKey === 'pending_confirm' || order.statusKey === 'completed')}}" class="order-elder-row">
+                <text class="elder-label">下单人：</text>
+                <text class="elder-name">{{order.elderName}}</text>
               </view>
 
               <view wx:if="{{order.remark}}" class="order-remark-row">
@@ -98,7 +105,6 @@
                 <view class="order-footer-info">
                   <text class="helper-info">我已接单</text>
                 </view>
-                <button class="btn btn-gray" catchtap="onContactHelper" data-id="{{order.id}}">联系TA</button>
                 <button class="btn btn-green" catchtap="onCompleteService" data-id="{{order.id}}">服务完成</button>
               </block>
 
@@ -170,3 +176,5 @@
   <nav-bar selected="1"></nav-bar>
   <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
 </view>
+
+<global-toast id="globalToast" />

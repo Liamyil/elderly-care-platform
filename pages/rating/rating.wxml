@@ -7,12 +7,13 @@
     <view class="nav-right"></view>
   </view>
   <view class="nav-content">
-    <view wx:if="{{orders.length > 0}}" class="order-list">
+    <!-- 待评价订单：完成后未评价的订单，可点「去评价」 -->
+    <view wx:if="{{pendingOrders.length > 0}}" class="order-list">
       <view class="section-header">
         <view class="section-title">待评价订单</view>
-        <text class="order-count">{{orders.length}}条待评价</text>
+        <text class="order-count">{{pendingOrders.length}}条待评价</text>
       </view>
-      <view class="order-card" wx:for="{{orders}}" wx:key="id">
+      <view class="order-card" wx:for="{{pendingOrders}}" wx:key="id">
         <view class="order-left-bar"></view>
         <view class="order-content">
           <view class="order-header">
@@ -35,10 +36,33 @@
       </view>
     </view>
 
-    <view wx:else class="empty-state">
+    <!-- 我写过的评价：历史评价记录 -->
+    <view wx:if="{{ratedOrders.length > 0}}" class="order-list rated-list">
+      <view class="section-header">
+        <view class="section-title">我写过的评价</view>
+        <text class="order-count">{{ratedOrders.length}}条</text>
+      </view>
+      <view class="rated-card" wx:for="{{ratedOrders}}" wx:key="id">
+        <view class="rated-header">
+          <text class="order-type">{{item.type}}</text>
+          <text class="order-time">{{item.date}}</text>
+        </view>
+        <view class="rated-helper">
+          <text class="helper-label">互助员：</text>
+          <text class="helper-name">{{item.helper}}</text>
+        </view>
+        <view class="rated-stars-row">
+          <text class="rated-stars">{{item.stars}}</text>
+          <text class="rated-score">{{item.rating}}.0分</text>
+        </view>
+        <view class="rated-comment">{{item.comment}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{pendingOrders.length === 0 && ratedOrders.length === 0}}" class="empty-state">
       <text class="empty-icon">😊</text>
-      <text class="empty-text">暂无待评价订单</text>
-      <text class="empty-hint">所有服务都已评价完成</text>
+      <text class="empty-text">暂无评价记录</text>
+      <text class="empty-hint">完成的服务订单可在此评价互助员</text>
     </view>
   </view>
 
@@ -94,3 +118,5 @@
     </view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

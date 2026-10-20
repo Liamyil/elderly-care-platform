@@ -11,6 +11,7 @@
     "pages/helper/order/order",
     "pages/helper/bank/bank",
     "pages/helper/mine/mine",
+    "pages/helper/rmb-bill/rmb-bill",
     "pages/health/health",
     "pages/rating/rating",
     "pages/about/about",
@@ -32,6 +33,7 @@
     "pages/serviceExchange/serviceExchange",
     "pages/giftExchange/giftExchange",
     "pages/helper/apply/apply",
+    "pages/order-detail/order-detail",
     "pages/admin/helper-audit/helper-audit",
     "pages/admin/config/config"
   ],
@@ -40,6 +42,9 @@
     "navigationBarTitleText": "互助养老",
     "navigationBarBackgroundColor": "#2D7D46",
     "backgroundColor": "#F7F8FA"
+  },
+  "usingComponents": {
+    "global-toast": "/components/global-toast/global-toast"
   },
   "tabBar": {
     "color": "#999999",

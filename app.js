@@ -20,16 +20,24 @@ App({
     }
 
     console.log('=== App onLaunch ===')
+
+    // 站内信闭环：记录会话启动时间，悬浮横幅只弹此时间之后产生的新消息（历史未读只走铃铛红点）
+    this._messageSessionStart = Date.now()
+    console.log('[msg-poll] 会话启动时间(ms) =', this._messageSessionStart, '=>', new Date(this._messageSessionStart).toLocaleString())
   },
   
   onShow() {
     console.log('=== App onShow ===')
     // 每次进入小程序：检测互助员申请通知（已通过未确认 → 恭喜弹窗；被驳回未读 → 驳回原因弹窗）
     this.checkHelperApplicationNotice()
+    // 站内信闭环：回前台启动 15 秒未读消息轮询（未登录内部直接跳过）
+    this.startMessagePolling()
   },
-  
+
   onHide() {
     console.log('=== App onHide ===')
+    // 退后台停轮询：微信后台会挂起 JS，避免回前台瞬间积压请求
+    this.stopMessagePolling()
   },
   
   onError(error) {
@@ -54,7 +62,10 @@ App({
     city: '上海市',
     district: '浦东新区',
     // 双重身份共存：当前工作模式 'user' 发单端 / 'helper' 接单端
-    currentMode: 'user'
+    currentMode: 'user',
+    // 完工通知点击定位：悬浮窗写入目标订单与页签，订单页 onShow 消费后立即清空
+    targetOrderId: '',
+    targetTab: ''
   },
   
   saveUserInfo: function(userInfo) {
@@ -170,5 +181,113 @@ App({
     }).catch((err) => {
       wx.showToast({ title: (err && err.message) || '切换失败', icon: 'none' })
     })
+  },
+
+  // ===== 站内信闭环 · 全局悬浮横幅（5 秒轮询最新未读，测试期；稳定后可回调 15 秒） =====
+  // 性能闸门：仅登录后 + 仅前台（onShow 启 / onHide 停）；请求为轻量静默接口（latest-unread 最多 3 条）；
+  // 排查结论落地：时间锁过滤已移除，仅保留同一消息 ID 去重；轮询响应同步驱动首页铃铛红点。
+
+  /** 启动消息轮询（app.onShow 与登录弹窗登录成功后调用；未登录直接返回） */
+  startMessagePolling: function() {
+    var token = wx.getStorageSync('token')
+    console.log('[msg-poll] startMessagePolling 被调用, token存在 =', !!token)
+    if (!token) return
+    this.stopMessagePolling()
+    if (!this._shownMessageIds) this._shownMessageIds = {}
+    var self = this
+    this._messagePollTimer = setInterval(function () { self.pollLatestUnread() }, 5000)
+    console.log('[msg-poll] 定时器已启动, timerId =', this._messagePollTimer)
+    this.pollLatestUnread()
+  },
+
+  /** 停止消息轮询（app.onHide 调用；登出后轮询内部自停） */
+  stopMessagePolling: function() {
+    console.log('[msg-poll] stopMessagePolling 被调用, 原 timerId =', this._messagePollTimer)
+    if (this._messagePollTimer) {
+      clearInterval(this._messagePollTimer)
+      this._messagePollTimer = null
+    }
+  },
+
+  /** 拉取最新未读 → 命中新消息则驱动当前页面的悬浮横幅展示；响应同步刷新首页铃铛红点 */
+  pollLatestUnread: function() {
+    var token = wx.getStorageSync('token')
+    if (!token) {
+      // 已登出：停止轮询，避免 401 空转
+      console.log('[msg-poll] pollLatestUnread: 无 token, 停止轮询')
+      this.stopMessagePolling()
+      return
+    }
+    if (this._messagePollBusy) {
+      console.log('[msg-poll] pollLatestUnread: 上一次请求未完成, 跳过本轮')
+      return
+    }
+    var self = this
+    this._messagePollBusy = true
+    console.log('[msg-poll] 请求 /api/messages/latest-unread ...', new Date().toLocaleTimeString())
+    const { get } = require('./utils/request')
+    get('/api/messages/latest-unread', {}, { silent: true }).then(function (list) {
+      self._messagePollBusy = false
+      console.log('[msg-poll] 接口返回:', JSON.stringify(list))
+      // 首页铃铛红点实时刷新：停留在页面上不触发 onShow，由轮询响应直接驱动红点
+      self.updateUnreadBadge(!!(list && list.length))
+      if (!list || !list.length) {
+        console.log('[msg-poll] 无未读消息, 本轮结束')
+        return
+      }
+      for (var i = 0; i < list.length; i++) {
+        var msg = list[i]
+        // 仅保留 ID 去重（同一条消息只弹一次）；时间锁过滤已按排查要求移除
+        if (self._shownMessageIds[msg.id]) {
+          console.log('[msg-poll] 跳过消息', msg.id, '「' + msg.title + '」, 原因: 该消息 ID 已弹过（去重命中）')
+          continue
+        }
+        self._shownMessageIds[msg.id] = true
+        var shown = self.showGlobalToast(msg)
+        console.log('[msg-poll] showGlobalToast 结果 =', shown, ', 消息 =', msg.id, '「' + msg.title + '」')
+        if (!shown) {
+          // 兜底：拿不到悬浮组件实例（页面未就绪/挂载异常）时用系统提示展示，标记保持不重复弹出
+          console.warn('[msg-poll] 悬浮组件不可用，改用系统 toast 兜底展示')
+          wx.showToast({
+            title: (msg.title || '新消息') + '：' + String(msg.content || '').slice(0, 30),
+            icon: 'none',
+            duration: 4000
+          })
+        }
+        break
+      }
+    }).catch(function (err) {
+      self._messagePollBusy = false
+      console.error('[msg-poll] 请求失败:', err && err.message)
+    })
+  },
+
+  /** 首页铃铛红点：轮询响应驱动当前页面（data 含 hasUnreadMessages 的页面，即首页）实时更新 */
+  updateUnreadBadge: function(hasUnread) {
+    var pages = getCurrentPages()
+    if (!pages.length) return
+    var page = pages[pages.length - 1]
+    if (!page || !page.setData || !page.data || !('hasUnreadMessages' in page.data)) return
+    if (page.data.hasUnreadMessages !== hasUnread) {
+      console.log('[msg-poll] 更新铃铛红点: hasUnreadMessages =', hasUnread, ', route =', page.route)
+      page.setData({ hasUnreadMessages: hasUnread })
+    }
+  },
+
+  /** 驱动当前页面的悬浮横幅展示（返回是否成功展示） */
+  showGlobalToast: function(msg) {
+    var pages = getCurrentPages()
+    console.log('[msg-poll] 页面栈深度 =', pages.length)
+    var page = pages.length ? pages[pages.length - 1] : null
+    if (!page || !page.selectComponent) {
+      console.log('[msg-poll] 当前页面不存在或无 selectComponent 方法')
+      return false
+    }
+    console.log('[msg-poll] 当前页面 route =', page.route)
+    var toast = page.selectComponent('#globalToast')
+    console.log('[msg-poll] selectComponent("#globalToast") =>', toast ? '拿到组件实例' : 'null（拿不到实例！）')
+    if (!toast) return false
+    toast.show(msg)
+    return true
   }
 })

@@ -46,8 +46,47 @@
   padding-top: 160rpx;
 }
 
+/* 分类 Tab（固定于导航下方） */
+.message-tabs {
+  position: fixed;
+  top: 160rpx;
+  left: 0;
+  right: 0;
+  display: flex;
+  background-color: #ffffff;
+  border-bottom: 1rpx solid #EEEEEE;
+  z-index: 998;
+}
+
+.message-tab {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx 0;
+  font-size: 30rpx;
+  color: #666666;
+  position: relative;
+}
+
+.message-tab.active {
+  color: #2D7D46;
+  font-weight: bold;
+}
+
+.message-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48rpx;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background-color: #2D7D46;
+}
+
 .message-list {
   padding: 24rpx;
+  padding-top: 128rpx;
 }
 
 .message-item {
@@ -128,6 +167,18 @@
 .message-time {
   font-size: 22rpx;
   color: #BBBBBB;
+}
+
+/* 带订单号的消息显示跳转提示 */
+.message-bottom-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.message-jump {
+  font-size: 22rpx;
+  color: #2D7D46;
 }
 
 .message-dot {

@@ -84,7 +84,7 @@ public class WithdrawalService {
         w.setCreatedAt(LocalDateTime.now());
         withdrawalRepository.save(w);
 
-        fundService.insertRmbTx(uid, "expense", "提现申请冻结", amount);
+        fundService.insertRmbTx(uid, "expense", "提现申请冻结", amount, null);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("id", w.getId());
@@ -158,7 +158,7 @@ public class WithdrawalService {
             user.setRmbBalance(balance.add(w.getAmount()));
             userRepository.save(user);
         }
-        fundService.insertRmbTx(w.getUserId(), "income", "提现驳回退回", w.getAmount());
+        fundService.insertRmbTx(w.getUserId(), "income", "提现驳回退回", w.getAmount(), null);
 
         operationLogService.record(reviewerId, OperationLog.TYPE_WITHDRAW_REJECT,
                 before, snapshotJson(w), reason.trim());

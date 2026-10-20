@@ -24,7 +24,7 @@
     </view>
 
     <view class="nearby-order-list">
-      <view class="nearby-order-card" wx:for="{{orders}}" wx:key="id">
+      <view class="nearby-order-card" wx:for="{{orders}}" wx:key="id" bindtap="goOrderDetail" data-id="{{item.id}}">
         <view class="nearby-card-header">
           <view class="nearby-type-row">
             <text class="nearby-order-type">{{item.type}}</text>
@@ -103,3 +103,5 @@
   <nav-bar selected="0"></nav-bar>
   <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
 </view>
+
+<global-toast id="globalToast" />

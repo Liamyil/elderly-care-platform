@@ -41,11 +41,18 @@ public class MessageController {
         return messageService.unreadCount(uid(request));
     }
 
+    /** 最新未读消息（全局悬浮横幅 15 秒轮询用，轻量静默） */
+    @GetMapping("/latest-unread")
+    public Result<List<Map<String, Object>>> latestUnread(HttpServletRequest request) {
+        return messageService.latestUnread(uid(request));
+    }
+
     /** 标记已读（需登录），messageId 为空则全部已读 */
     @PutMapping("/read")
     public Result<Void> markRead(HttpServletRequest request, @RequestBody(required = false) Map<String, Object> body) {
+        Object messageId = body == null ? null : body.get("messageId");
         return messageService.markRead(uid(request),
-                body == null ? null : String.valueOf(body.get("messageId")));
+                messageId == null ? null : String.valueOf(messageId));
     }
 
     /** 删除消息（需登录） */

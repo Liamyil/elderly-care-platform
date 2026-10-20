@@ -656,3 +656,17 @@
   line-height: 1.6;
   margin-top: 16rpx;
 }
+
+/* ===== 完工通知定位高亮：呼吸灯外发光（3 秒后由 JS 移除类名，动画 2.5 次 ≈ 3 秒） ===== */
+.card-highlight {
+  animation: card-breathe 1.2s ease-in-out 2.5;
+}
+
+@keyframes card-breathe {
+  0%, 100% {
+    box-shadow: 0 0 8rpx 4rpx rgba(7, 193, 96, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 24rpx 12rpx rgba(7, 193, 96, 0.55);
+  }
+}

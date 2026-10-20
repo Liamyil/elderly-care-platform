@@ -32,6 +32,10 @@ public class Message {
     @Column(columnDefinition = "text")
     private String content;
 
+    /** 关联订单号（点击消息跳转订单详情，系统通知可为空） */
+    @Column(name = "order_id", length = 50)
+    private String orderId;
+
     /** 是否已读 0/1 */
     @Column(name = "is_read")
     private Integer isRead;
@@ -77,6 +81,14 @@ public class Message {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 
     public Integer getIsRead() {

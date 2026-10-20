@@ -31,8 +31,9 @@
         <text class="card-title">基本信息</text>
         <view class="form-row">
           <text class="form-label">真实姓名</text>
-          <input class="form-input" placeholder="请输入真实姓名" value="{{form.realName}}" data-field="realName" bindinput="onInput" disabled="{{application && application.status === 'approved'}}" />
+          <input class="form-input {{nameError ? 'input-error' : ''}}" placeholder="请输入真实姓名" value="{{form.realName}}" data-field="realName" bindinput="onRealNameInput" disabled="{{application && application.status === 'approved'}}" />
         </view>
+        <view wx:if="{{nameError}}" class="error-tip">请输入真实的姓名（仅限中英文字母）</view>
         <view class="form-row">
           <text class="form-label">手机号</text>
           <input class="form-input form-input-readonly" placeholder="未绑定手机号" value="{{form.phone}}" disabled />
@@ -89,3 +90,5 @@
     <view wx:if="{{application && application.status === 'pending'}}" class="back-mine" bindtap="goMine">返回「我的」</view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

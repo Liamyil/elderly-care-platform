@@ -25,12 +25,15 @@
       duration="300"
     >
       <swiper-item wx:for="{{statusTabs}}" wx:key="key" class="swiper-item">
-        <scroll-view scroll-y class="order-list" show-scrollbar="{{false}}">
-          <view 
-            wx:for="{{orders[item.key]}}" 
+        <scroll-view scroll-y class="order-list" show-scrollbar="{{false}}" scroll-into-view="{{scrollIntoView}}">
+          <view
+            wx:for="{{orders[item.key]}}"
             wx:for-item="order"
             wx:key="id"
-            class="order-card"
+            id="order-{{order.id}}"
+            class="order-card {{order.isHighlight ? 'card-highlight' : ''}}"
+            bindtap="goOrderDetail"
+            data-id="{{order.id}}"
           >
             <view class="order-header">
               <text class="order-no">订单号：{{order.id}}</text>
@@ -100,14 +103,12 @@
                   <view class="order-footer-info">
                     <text class="helper-info">我已接单</text>
                   </view>
-                  <button class="btn btn-gray" catchtap="onContactHelper" data-id="{{order.id}}">联系TA</button>
                   <button class="btn btn-green" catchtap="onCompleteService" data-id="{{order.id}}">服务完成</button>
                 </block>
                 <block wx:else>
-                  <!-- 同一底色块：左=互助员详情，右=联系TA（状态实时刷新，确认完成按钮只在待确认状态出现） -->
+                  <!-- 互助员详情（联系方式见订单详情页） -->
                   <view class="helper-detail-row">
                     <button class="btn helper-btn-left" catchtap="goHelperDetail" data-helper="{{order.helper}}">{{order.helper}} 详情</button>
-                    <button class="btn helper-contact-btn" catchtap="onContactHelper" data-id="{{order.id}}">联系TA</button>
                   </view>
                   <!-- 取消订单 -->
                   <button class="btn btn-orange" catchtap="onCancelOrder" data-id="{{order.id}}">取消订单</button>
@@ -128,7 +129,6 @@
                   <button class="btn btn-disabled" disabled>等待确认中...</button>
                 </block>
                 <block wx:else>
-                  <button class="btn btn-gray" catchtap="onContactHelper" data-id="{{order.id}}">联系TA</button>
                   <button class="btn btn-orange" catchtap="onAddReward" data-id="{{order.id}}">添加时间币</button>
                   <button class="btn btn-green" catchtap="onConfirmComplete" data-id="{{order.id}}">确认完成</button>
                 </block>
@@ -275,3 +275,5 @@
   </view>
   <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
 </view>
+
+<global-toast id="globalToast" />

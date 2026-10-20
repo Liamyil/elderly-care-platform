@@ -74,3 +74,5 @@
     <view class="bottom-order" bindtap="onOrder">立即下单</view>
   </view>
 </view>
+
+<global-toast id="globalToast" />

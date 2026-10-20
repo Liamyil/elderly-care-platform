@@ -161,6 +161,54 @@
   border-radius: 30rpx;
 }
 
+/* ===== 我写过的评价：历史记录卡片 ===== */
+
+.rated-card {
+  background-color: #ffffff;
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.06);
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.rated-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.rated-helper {
+  margin-bottom: 16rpx;
+}
+
+.rated-stars-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.rated-stars {
+  font-size: 34rpx;
+  color: #FFB300;
+  letter-spacing: 4rpx;
+  line-height: 1;
+}
+
+.rated-score {
+  font-size: 26rpx;
+  color: #E8852E;
+  font-weight: bold;
+  margin-left: 14rpx;
+}
+
+.rated-comment {
+  font-size: 26rpx;
+  color: #666666;
+  line-height: 1.6;
+  word-break: break-all;
+}
+
 .empty-state {
   display: flex;
   flex-direction: column;

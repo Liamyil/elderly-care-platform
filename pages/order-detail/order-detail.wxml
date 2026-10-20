@@ -1,0 +1,137 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">订单详情</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <block wx:if="{{order}}">
+      <!-- 状态横幅 -->
+      <view class="status-banner">
+        <text class="status-text {{order.statusKey}}">{{order.statusKey === 'pending_confirm' ? '服务完成·待确认' : order.status}}</text>
+      </view>
+
+      <!-- 基础信息 -->
+      <view class="detail-card">
+        <text class="card-title">基础信息</text>
+        <view class="info-row">
+          <text class="info-label">订单号</text>
+          <text class="info-value">{{order.id}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">服务类型</text>
+          <text class="info-value">{{order.type}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">报酬</text>
+          <text class="info-value">{{order.priceText ? ('¥' + order.priceText) : ('🪙 ' + order.reward + '时间币')}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">预约时间</text>
+          <text class="info-value">{{order.time}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">服务地址</text>
+          <text class="info-value">{{order.address}}</text>
+        </view>
+        <view wx:if="{{order.remark}}" class="info-row">
+          <text class="info-label">需求描述</text>
+          <text class="info-value">{{order.remark}}</text>
+        </view>
+        <view wx:if="{{order.cancelReason}}" class="info-row">
+          <text class="info-label">取消原因</text>
+          <text class="info-value">{{order.cancelReason}}</text>
+        </view>
+      </view>
+
+      <!-- 订单时间轴：发单 / 接单 / 服务完成（有值才显示） -->
+      <view class="detail-card">
+        <text class="card-title">订单时间轴</text>
+        <view class="timeline">
+          <view wx:if="{{order.publishTime}}" class="timeline-item">
+            <view class="timeline-dot"></view>
+            <view class="timeline-body">
+              <text class="timeline-label">发单时间</text>
+              <text class="timeline-time">{{order.publishTime}}</text>
+            </view>
+          </view>
+          <view wx:if="{{order.acceptedAt}}" class="timeline-item">
+            <view class="timeline-dot"></view>
+            <view class="timeline-body">
+              <text class="timeline-label">接单时间</text>
+              <text class="timeline-time">{{order.acceptedAt}}</text>
+            </view>
+          </view>
+          <view wx:if="{{order.completedAt}}" class="timeline-item">
+            <view class="timeline-dot"></view>
+            <view class="timeline-body">
+              <text class="timeline-label">服务完成时间</text>
+              <text class="timeline-time">{{order.completedAt}}</text>
+            </view>
+          </view>
+          <view wx:if="{{order.cancelTime}}" class="timeline-item">
+            <view class="timeline-dot"></view>
+            <view class="timeline-body">
+              <text class="timeline-label">取消时间</text>
+              <text class="timeline-time">{{order.cancelTime}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+
+      <!-- 联系方式（后端按身份下发；未接单/已取消/非当事方无完整信息） -->
+      <view class="detail-card">
+        <text class="card-title">联系方式</text>
+        <!-- 互助员端：已接单 → 老人完整姓名 + 电话拨号 -->
+        <block wx:if="{{order.isAssignedHelper && order.elderPhone}}">
+          <view class="info-row">
+            <text class="info-label">老人姓名</text>
+            <text class="info-value">{{order.elderName}}</text>
+          </view>
+          <button class="call-btn" bindtap="onCallPhone" data-phone="{{order.elderPhone}}">📞 拨打 {{order.elderPhone}}</button>
+        </block>
+        <block wx:elif="{{order.isAssignedHelper}}">
+          <text class="contact-hint">暂无可用联系方式（对方未绑定手机号或订单已结束）</text>
+        </block>
+        <!-- 老人端：已接单 → 互助员姓名 + 电话拨号 -->
+        <block wx:elif="{{order.isCreator && order.helperPhone}}">
+          <view class="info-row">
+            <text class="info-label">互助员姓名</text>
+            <text class="info-value">{{order.helperName}}</text>
+          </view>
+          <button class="call-btn" bindtap="onCallPhone" data-phone="{{order.helperPhone}}">📞 拨打 {{order.helperPhone}}</button>
+        </block>
+        <block wx:elif="{{order.isCreator && order.helperName}}">
+          <view class="info-row">
+            <text class="info-label">互助员姓名</text>
+            <text class="info-value">{{order.helperName}}</text>
+          </view>
+          <text class="contact-hint">对方未绑定手机号</text>
+        </block>
+        <block wx:elif="{{order.isCreator}}">
+          <text class="contact-hint">{{order.statusKey === 'pending' ? '等待互助员接单，接单后可查看联系方式' : '暂无互助员信息'}}</text>
+        </block>
+        <!-- 非当事方（如大厅点入未接单订单）：脱敏姓名 + 提示 -->
+        <block wx:else>
+          <view class="info-row">
+            <text class="info-label">发布人</text>
+            <text class="info-value">{{order.elderName}}</text>
+          </view>
+          <text class="contact-hint">{{order.statusKey === 'cancelled' ? '订单已取消' : '接单后可查看完整联系方式'}}</text>
+        </block>
+      </view>
+    </block>
+
+    <view wx:if="{{!order && !loading}}" class="empty-state">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">订单不存在</text>
+    </view>
+  </view>
+
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>
+
+<global-toast id="globalToast" />

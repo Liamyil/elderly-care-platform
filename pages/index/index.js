@@ -1,5 +1,5 @@
 const { IndexAPI, BankAPI, OrderAPI } = require('../../utils/api')
-const { getBaseUrl } = require('../../utils/request')
+const { getBaseUrl, get } = require('../../utils/request')
 const app = getApp()
 
 Page({
@@ -20,7 +20,7 @@ Page({
       '浙江': ['杭州市·上城区', '杭州市·拱墅区', '杭州市·西湖区', '杭州市·滨江区', '杭州市·萧山区', '杭州市·余杭区', '杭州市·临平区', '杭州市·钱塘区', '宁波市·海曙区', '宁波市·江北区', '宁波市·北仑区', '宁波市·镇海区', '宁波市·鄞州区', '宁波市·奉化区', '温州市·鹿城区', '温州市·龙湾区', '温州市·瓯海区', '温州市·洞头区', '嘉兴市·南湖区', '嘉兴市·秀洲区', '绍兴市·越城区', '绍兴市·柯桥区', '绍兴市·上虞区']
     },
     currentDistricts: [],
-    hasUnreadMessages: true,
+    hasUnreadMessages: false,
     searchKeyword: '',
     showImageModal: false,
     previewImages: []
@@ -44,6 +44,7 @@ Page({
     this.checkCurrentMode()
     if (app.globalData.userInfo) {
       this.loadHomeData()
+      this.loadUnreadCount()
     }
   },
 
@@ -88,6 +89,20 @@ Page({
     })
   },
 
+  /** 未读消息数（消息铃铛红点）：游客不显示红点；登录后静默拉取 */
+  async loadUnreadCount() {
+    if (!app.globalData.userInfo) {
+      this.setData({ hasUnreadMessages: false })
+      return
+    }
+    try {
+      const data = await get('/api/messages/unread', {}, { silent: true })
+      this.setData({ hasUnreadMessages: (data && data.count) > 0 })
+    } catch (error) {
+      console.error('获取未读消息数失败:', error ? (error.message || JSON.stringify(error)) : 'unknown')
+    }
+  },
+
   goToMessage() {
     wx.showToast({
       title: '消息功能开发中',
@@ -117,6 +132,8 @@ Page({
 
   onLoginSuccess() {
     this.setData({ showLogin: false })
+    this.loadHomeData()
+    this.loadUnreadCount()
   },
 
   onLoginClose() {

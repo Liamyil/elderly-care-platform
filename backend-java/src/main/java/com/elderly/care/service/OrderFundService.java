@@ -40,7 +40,7 @@ public class OrderFundService {
     }
 
     /** 互助类发单冻结时间币：余额足够则扣减并记支出流水，返回是否成功（余额不足返回 false） */
-    public boolean freezeCoins(Long uid, int coins, String orderType) {
+    public boolean freezeCoins(Long uid, int coins, String orderType, String orderId) {
         User user = userRepository.findByIdForUpdate(uid).orElse(null);
         int balance = user == null || user.getTimeCoins() == null ? 0 : user.getTimeCoins();
         if (user == null || balance < coins) {
@@ -48,7 +48,7 @@ public class OrderFundService {
         }
         user.setTimeCoins(balance - coins);
         userRepository.save(user);
-        insertCoinTx(uid, "expense", orderType + "-下单冻结", coins);
+        insertCoinTx(uid, "expense", orderType + "-下单冻结", coins, orderId);
         return true;
     }
 
@@ -69,9 +69,11 @@ public class OrderFundService {
                     owner.setTimeCoins((owner.getTimeCoins() == null ? 0 : owner.getTimeCoins()) + frozen);
                     userRepository.save(owner);
                 }
-                insertCoinTx(order.getUserId(), "income", order.getType() + "-取消退回", frozen);
+                insertCoinTx(order.getUserId(), "income", order.getType() + "-取消退回", frozen, order.getId());
             }
             order.setRefunded(1);
+            // 退款完成后冻结数清零（hasFrozenFunds 与后台展示不再误报冻结中）
+            order.setFrozenCoins(0);
         } else if (ASSET_RMB.equals(order.getAssetType()) && PAY_PAID.equals(order.getPayStatus())) {
             order.setPayStatus(PAY_REFUNDED);
             order.setRefunded(1);
@@ -91,7 +93,8 @@ public class OrderFundService {
 
     /**
      * 完成结算（settled 幂等防重）：按币种打款给互助员，返回结算描述（无资金可结算返回 null）。
-     * 时间币：互助员 +reward（下单人发单时已冻结扣款，此处不再重复扣）；
+     * 时间币：互助员 +reward（下单人发单时已冻结扣款，此处不再重复扣），
+     * 并把下单人的「下单冻结」流水改名为「服务消费」——账单从冻结态落定为扣除记录；
      * 人民币：互助员 rmb_balance += rmb_amount（进入可提现余额）。
      */
     public String settleOnComplete(Order order) {
@@ -113,8 +116,11 @@ public class OrderFundService {
                 helper.setServiceCount((helper.getServiceCount() == null ? 0 : helper.getServiceCount()) + 1);
                 userRepository.save(helper);
             }
-            insertCoinTx(helperId, "income", order.getType(), reward);
+            insertCoinTx(helperId, "income", order.getType(), reward, order.getId());
             order.setSettled(1);
+            // 下单人账单落定：冻结流水改名「服务消费」（含追加冻结的多条流水，按订单号+流水名精确匹配）
+            transactionRepository.renameFreezeToSettled(order.getId(), order.getUserId(),
+                    order.getType() + "-下单冻结", order.getType() + "-服务消费");
             return "获得" + reward + "个时间币";
         }
         if (ASSET_RMB.equals(order.getAssetType())) {
@@ -129,15 +135,15 @@ public class OrderFundService {
                 helper.setServiceCount((helper.getServiceCount() == null ? 0 : helper.getServiceCount()) + 1);
                 userRepository.save(helper);
             }
-            insertRmbTx(helperId, "income", order.getType(), amount);
+            insertRmbTx(helperId, "income", order.getType(), amount, order.getId());
             order.setSettled(1);
             return "获得" + amount.stripTrailingZeros().toPlainString() + "元";
         }
         return null;
     }
 
-    /** 时间币流水（amount 记币数） */
-    public void insertCoinTx(Long userId, String type, String name, int amount) {
+    /** 时间币流水（amount 记币数，orderId 关联订单供结算/退款回写） */
+    public void insertCoinTx(Long userId, String type, String name, int amount, String orderId) {
         Transaction tx = new Transaction();
         tx.setId("TX" + System.currentTimeMillis());
         tx.setUserId(userId);
@@ -145,11 +151,12 @@ public class OrderFundService {
         tx.setName(name);
         tx.setAmount(amount);
         tx.setAssetType(ASSET_TIME_COIN);
+        tx.setOrderId(orderId);
         transactionRepository.save(tx);
     }
 
     /** 人民币流水（amount 记 0，rmb_amount 记金额） */
-    public void insertRmbTx(Long userId, String type, String name, BigDecimal amount) {
+    public void insertRmbTx(Long userId, String type, String name, BigDecimal amount, String orderId) {
         Transaction tx = new Transaction();
         tx.setId("TX" + System.currentTimeMillis());
         tx.setUserId(userId);
@@ -158,6 +165,7 @@ public class OrderFundService {
         tx.setAmount(0);
         tx.setAssetType(ASSET_RMB);
         tx.setRmbAmount(amount);
+        tx.setOrderId(orderId);
         transactionRepository.save(tx);
     }
 }

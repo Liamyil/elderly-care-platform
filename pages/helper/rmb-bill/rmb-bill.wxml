@@ -1,0 +1,62 @@
+<view class="page-container">
+  <view class="custom-nav" style="padding-top: {{statusBarHeight}}px;">
+    <view class="nav-left" bindtap="goBack">
+      <text class="nav-back-icon">‹</text>
+    </view>
+    <text class="nav-title">人民币账单</text>
+    <view class="nav-right"></view>
+  </view>
+
+  <view class="nav-content">
+    <view class="overview-card">
+      <view class="balance-section">
+        <text class="balance-label">当前人民币余额(元)</text>
+        <view class="balance-value">
+          <text class="balance-num">{{rmbBalance}}</text>
+          <text class="balance-unit">元</text>
+        </view>
+      </view>
+      <view class="stats-row">
+        <view class="stat-item">
+          <text class="stat-value income">+{{totalIncome}}元</text>
+          <text class="stat-label">累计收入</text>
+        </view>
+        <view class="stat-divider"></view>
+        <view class="stat-item">
+          <text class="stat-value expense">-{{totalExpense}}元</text>
+          <text class="stat-label">累计支出</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="recent-section">
+      <view class="section-header">
+        <text class="section-title">收支明细</text>
+        <text class="section-more">仅展示人民币流水</text>
+      </view>
+      <view class="transaction-list">
+        <view
+          wx:for="{{transactions}}"
+          wx:key="id"
+          class="transaction-item"
+        >
+          <view class="transaction-icon {{item.type}}">
+            <text class="icon-text">{{item.type === 'income' ? '+' : '-'}}</text>
+          </view>
+          <view class="transaction-info">
+            <text class="transaction-name">{{item.name}}</text>
+            <text class="transaction-time">{{item.time}}</text>
+          </view>
+          <text class="transaction-amount {{item.type}}">{{item.displayAmount}}</text>
+        </view>
+      </view>
+      <view wx:if="{{transactions.length === 0}}" class="empty-state">
+        <text class="empty-text">暂无人民币流水</text>
+      </view>
+    </view>
+  </view>
+
+  <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
+</view>
+
+<global-toast id="globalToast" />

@@ -1,0 +1,41 @@
+/* 全局悬浮消息横幅：fixed 置顶（180rpx 避开右上微信胶囊按钮），z-index 9999 不被遮挡。
+   滑入/滑出用 CSS transition（.show 类切换），默认隐藏态在屏幕上方，加 .show 后过渡到定位处 */
+.global-toast-wrap {
+  position: fixed;
+  top: 180rpx;
+  left: 40rpx;
+  right: 40rpx;
+  z-index: 9999;
+  transform: translateY(-160px);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.global-toast-wrap.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.toast-body {
+  display: flex;
+  flex-direction: column;
+  background: #333333;
+  color: #ffffff;
+  border-radius: 16rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.25);
+}
+
+.toast-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.4;
+}
+
+.toast-content {
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+  margin-top: 6rpx;
+}

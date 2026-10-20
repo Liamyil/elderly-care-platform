@@ -17,6 +17,9 @@ public interface MessageRepository extends JpaRepository<Message, String> {
 
     List<Message> findByUserIdAndTypeOrderByCreatedAtDesc(Long userId, String type);
 
+    /** 最新未读消息（全局悬浮横幅轮询用，最多 3 条） */
+    List<Message> findTop3ByUserIdAndIsReadOrderByCreatedAtDesc(Long userId, Integer isRead);
+
     long countByUserIdAndIsRead(Long userId, Integer isRead);
 
     /** 标记单条已读 */

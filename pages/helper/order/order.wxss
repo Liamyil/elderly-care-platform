@@ -195,6 +195,29 @@
   white-space: nowrap;
 }
 
+/* 下单人姓名行（服务中/已完成卡片） */
+.order-elder-row {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12rpx;
+}
+
+.elder-label {
+  font-size: 26rpx;
+  color: #999999;
+  flex-shrink: 0;
+}
+
+.elder-name {
+  font-size: 26rpx;
+  color: #2D7D46;
+  font-weight: bold;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .order-remark-row,
 .order-images-row {
   display: flex;

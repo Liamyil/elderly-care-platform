@@ -88,3 +88,5 @@
 
   <login-popup show="{{showLogin}}" bind:success="onLoginSuccess" bind:close="onLoginClose" />
 </view>
+
+<global-toast id="globalToast" />
