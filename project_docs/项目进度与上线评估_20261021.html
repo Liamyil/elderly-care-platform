@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智慧互助养老平台 · 项目进度与上线评估</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --green: #2D7D46;
+    --green-dark: #1E5C33;
+    --green-light: #F2F8F4;
+    --green-line: #D8E9DE;
+    --ink: #1A2A20;
+    --ink-2: #44514A;
+    --muted: #7A857E;
+    --amber: #B45309;
+    --amber-bg: #FEF6E7;
+    --red: #B42318;
+    --red-bg: #FDF0EE;
+    --gray-bg: #F4F5F4;
+    --line: #E6EAE7;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: #EDF1EE;
+    color: var(--ink);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    padding: 28px 16px 60px;
+  }
+  .page {
+    max-width: 1080px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 24px rgba(30, 60, 40, .09);
+    overflow: hidden;
+  }
+
+  /* ---------- 页头 ---------- */
+  .hero {
+    background: linear-gradient(135deg, #2D7D46 0%, #24663A 60%, #1C5230 100%);
+    color: #fff;
+    padding: 40px 48px 34px;
+    position: relative;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; right: -60px; top: -60px;
+    width: 260px; height: 260px; border-radius: 50%;
+    background: rgba(255,255,255,.05);
+  }
+  .hero-top {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    gap: 20px; flex-wrap: wrap; position: relative; z-index: 1;
+  }
+  .hero h1 { font-size: 27px; font-weight: 700; letter-spacing: .5px; }
+  .hero .sub { font-size: 14px; opacity: .82; margin-top: 8px; }
+  .hero-meta {
+    text-align: right; font-size: 12.5px; opacity: .85; line-height: 1.9;
+    white-space: nowrap;
+  }
+  .hero-meta b { font-weight: 600; }
+
+  /* ---------- 结论条 ---------- */
+  .verdict {
+    margin: 0 48px;
+    margin-top: -18px;
+    position: relative; z-index: 2;
+    background: #fff;
+    border: 1px solid var(--green-line);
+    border-left: 5px solid var(--green);
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 4px 14px rgba(30, 60, 40, .07);
+  }
+  .verdict .tag {
+    display: inline-block; font-size: 11.5px; font-weight: 700;
+    color: var(--green); background: var(--green-light);
+    padding: 2px 9px; border-radius: 4px; letter-spacing: 1px;
+    margin-bottom: 9px;
+  }
+  .verdict p { font-size: 15.5px; color: var(--ink); font-weight: 500; }
+  .verdict p span { color: var(--green-dark); font-weight: 700; }
+  .verdict p em { font-style: normal; color: var(--amber); font-weight: 600; }
+
+  /* ---------- 内容区 ---------- */
+  .body { padding: 40px 48px 48px; }
+  section { margin-bottom: 42px; }
+  section:last-child { margin-bottom: 0; }
+
+  h2 {
+    font-size: 17px; font-weight: 700; color: var(--ink);
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 18px; padding-bottom: 11px;
+    border-bottom: 1px solid var(--line);
+  }
+  h2 .num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--green); color: #fff;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  h2 .hint { font-size: 12.5px; font-weight: 400; color: var(--muted); margin-left: auto; }
+
+  /* ---------- 数据卡 ---------- */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  .stat {
+    background: var(--green-light);
+    border: 1px solid var(--green-line);
+    border-radius: 9px;
+    padding: 16px 14px 14px;
+    text-align: center;
+  }
+  .stat .v {
+    font-size: 25px; font-weight: 700; color: var(--green-dark);
+    line-height: 1.2; letter-spacing: -.5px;
+  }
+  .stat .v small { font-size: 13px; font-weight: 600; margin-left: 1px; }
+  .stat .k { font-size: 12px; color: var(--ink-2); margin-top: 5px; }
+
+  /* ---------- 表格 ---------- */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead th {
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-weight: 600; font-size: 12.5px;
+    text-align: left; padding: 10px 12px;
+    border-bottom: 1px solid var(--green-line);
+    white-space: nowrap;
+  }
+  tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2); vertical-align: top;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #FAFCFA; }
+  td.name { color: var(--ink); font-weight: 600; white-space: nowrap; }
+  td.strong { color: var(--ink); }
+
+  .pill {
+    display: inline-block; padding: 1px 8px; border-radius: 20px;
+    font-size: 11.5px; font-weight: 600; white-space: nowrap;
+    line-height: 1.7;
+  }
+  .p-done { background: #E6F4EA; color: #1E6B38; }
+  .p-part { background: var(--amber-bg); color: var(--amber); }
+  .p-none { background: var(--gray-bg); color: #7A857E; }
+  .p-risk { background: var(--red-bg); color: var(--red); }
+
+  /* ---------- 门槛卡 ---------- */
+  .gate-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .gate {
+    border: 1px solid var(--line); border-radius: 10px;
+    padding: 17px 19px; background: #fff;
+    position: relative;
+  }
+  .gate.hot { border-color: #F0C6B8; background: #FFFCFB; }
+  .gate-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .gate-icon {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--green-light); color: var(--green-dark);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; flex-shrink: 0;
+  }
+  .gate.hot .gate-icon { background: var(--red-bg); color: var(--red); }
+  .gate-head h3 { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+  .gate-head .lvl {
+    margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 500;
+  }
+  .gate ul { list-style: none; }
+  .gate li {
+    font-size: 13px; color: var(--ink-2); padding-left: 15px;
+    position: relative; margin-bottom: 6px; line-height: 1.6;
+  }
+  .gate li::before {
+    content: ""; position: absolute; left: 2px; top: 9px;
+    width: 4px; height: 4px; border-radius: 50%; background: #B9C7BE;
+  }
+  .gate.hot li::before { background: #E0A292; }
+  .gate li b { color: var(--ink); font-weight: 600; }
+  .gate li em { font-style: normal; color: var(--red); font-weight: 600; }
+
+  /* ---------- 路线图 ---------- */
+  .road { position: relative; padding-left: 26px; }
+  .road::before {
+    content: ""; position: absolute; left: 7px; top: 8px; bottom: 14px;
+    width: 2px; background: linear-gradient(to bottom, var(--green) 0%, var(--green-line) 100%);
+  }
+  .step { position: relative; margin-bottom: 22px; }
+  .step:last-child { margin-bottom: 0; }
+  .step::before {
+    content: ""; position: absolute; left: -26px; top: 5px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; border: 3px solid var(--green);
+  }
+  .step.now::before { background: var(--green); }
+  .step-head {
+    display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+    margin-bottom: 5px;
+  }
+  .step-head h3 { font-size: 14.5px; font-weight: 700; color: var(--ink); }
+  .step-head .when {
+    font-size: 12px; color: var(--green-dark); background: var(--green-light);
+    padding: 1px 8px; border-radius: 4px; font-weight: 600;
+  }
+  .step p { font-size: 13px; color: var(--ink-2); }
+  .step p b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- 决策卡 ---------- */
+  .decide { display: grid; gap: 12px; }
+  .dc {
+    display: flex; gap: 14px;
+    background: var(--green-light);
+    border: 1px solid var(--green-line);
+    border-radius: 10px; padding: 16px 18px;
+  }
+  .dc .n {
+    font-size: 19px; font-weight: 700; color: var(--green);
+    line-height: 1.3; flex-shrink: 0; width: 22px;
+  }
+  .dc h4 { font-size: 14px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+  .dc p { font-size: 13px; color: var(--ink-2); }
+  .dc p b { color: var(--green-dark); }
+
+  /* ---------- 脚注 ---------- */
+  .foot {
+    font-size: 12px; color: var(--muted);
+    border-top: 1px solid var(--line);
+    padding-top: 16px; margin-top: 34px;
+    display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  }
+
+  @media (max-width: 820px) {
+    body { padding: 0; }
+    .page { border-radius: 0; }
+    .hero { padding: 28px 22px 26px; }
+    .hero h1 { font-size: 21px; }
+    .hero-meta { text-align: left; }
+    .verdict { margin: 0 16px; padding: 16px 18px; }
+    .verdict p { font-size: 14px; }
+    .body { padding: 26px 18px 32px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .gate-grid { grid-template-columns: 1fr; }
+    h2 { font-size: 15.5px; }
+    h2 .hint { display: none; }
+    table { font-size: 12.5px; }
+    .tbl-wrap { overflow-x: auto; }
+  }
+
+  @media print {
+    body { background: #fff; padding: 0; font-size: 12px; }
+    .page { box-shadow: none; border-radius: 0; max-width: 100%; }
+    .hero { padding: 24px 30px 20px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .body { padding: 24px 30px; }
+    section { margin-bottom: 26px; page-break-inside: avoid; }
+    .gate, .stat, .dc { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .pill, thead th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .verdict { margin: 0 30px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <h1>智慧互助养老平台 · 项目进度与上线评估</h1>
+        <div class="sub">社区互助养老 · 三端一体（微信小程序 / H5 管理后台 / 后端服务）</div>
+      </div>
+      <div class="hero-meta">
+        汇报日期　<b>2026 年 10 月 21 日</b><br>
+        汇报对象　<b>周总</b><br>
+        当前版本　<b>V1.0（演示版就绪）</b>
+      </div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <div class="tag">核 心 结 论</div>
+    <p>
+      平台<span>核心业务闭环已全线跑通</span>——从老人发单、互助员抢单、上门打卡、完工确认到时间币结算与评价，
+      三端数据实时联动，<span>具备可演示、可试点的完整形态</span>。
+      距离<span>正式对外运营</span>，技术侧缺口集中在 <em>真实支付、真实短信、云端部署</em>，
+      业务侧需先行解决 <em>资质合规、上门服务风控与互助员供给</em> 三项。
+      建议以 <span>单社区灰度试点</span> 方式上线，而非全域铺开。
+    </p>
+  </div>
+
+  <div class="body">
+
+    <!-- 1 规模 -->
+    <section>
+      <h2><span class="num">1</span>项目规模　<span class="hint">从 0 搭建，非采购、非模板</span></h2>
+      <div class="stats">
+        <div class="stat"><div class="v">35</div><div class="k">小程序页面</div></div>
+        <div class="stat"><div class="v">85</div><div class="k">后端接口</div></div>
+        <div class="stat"><div class="v">9</div><div class="k">核心数据表</div></div>
+        <div class="stat"><div class="v">3.0<small>万行</small></div><div class="k">自有代码量</div></div>
+        <div class="stat"><div class="v">6</div><div class="k">角色权限体系</div></div>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:11px;">
+        代码构成：微信小程序 21,267 行（35 页 / 4 类公共组件）＋ 后端 SpringBoot 7,342 行（48 个类）＋ H5 管理后台 1,467 行（8 个页面）。
+        全部为自研代码，未依赖第三方成品系统，知识产权完全自有。
+      </p>
+    </section>
+
+    <!-- 2 已完成 -->
+    <section>
+      <h2><span class="num">2</span>已落地能力　<span class="hint">本期范围，可现场演示</span></h2>
+      <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:150px">模块</th><th style="width:74px">状态</th><th>已实现内容</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">需求发起与派单</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>老人 / 家属自主发单、分类与图片上传、预约时间智能生成；订单广场抢单、管理员定向指派、30 分钟超时订单置顶提示。</td>
+          </tr>
+          <tr>
+            <td class="name">服务履约与留痕</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>开工 / 完工双打卡（定位 + 现场拍照 + 人工确认），完工打卡为完成服务硬前置，全流程时间轴可回溯，管理端可查照片与坐标。</td>
+          </tr>
+          <tr>
+            <td class="name">资金结算（双轨制）</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>时间币与人民币彻底隔离：互助单按 1 小时 = 1 时间币、陪诊单按人民币计价；发单冻结、完成结算、取消自动退款，全流水带订单号，防重复结算。</td>
+          </tr>
+          <tr>
+            <td class="name">角色与权限</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>六角色分权（老人 / 家属 / 互助员 / 社区管理员 / 民政管理员 / 超管）；民政只读监管 + 紧急干预强制留痕；老人手机号对民政脱敏；操作日志只增不改。</td>
+          </tr>
+          <tr>
+            <td class="name">互助员准入</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>注册改审核制：承诺书倒计时签署 → 填写真实信息（含年龄、经验、常住区域）→ 社区管理员审核，驳回必填原因可重提；通过后双身份自由切换发单 / 接单。</td>
+          </tr>
+          <tr>
+            <td class="name">管理后台</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>8 个页面：订单全流程管理、用户管理、账号管理、互助员审核、数据统计（KPI + 趋势图 + 状态分布）、系统配置与审计日志、CSV 报表导出。</td>
+          </tr>
+          <tr>
+            <td class="name">消息通知</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>站内信全链路闭环：接单 / 完工 / 结算 / 取消四节点自动触发，全局悬浮通知横条、未读角标、订单定向跳转，15 秒轮询实时送达。</td>
+          </tr>
+          <tr>
+            <td class="name">陪诊专项</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>17 类陪诊服务、医院两级选择、帮办事项多选、下单前健康评估问卷（风险分级随单流转）、真实评价展示与销量统计。</td>
+          </tr>
+          <tr>
+            <td class="name">适老化交互</td>
+            <td><span class="pill p-done">已完成</span></td>
+            <td>全局大字号（正文 32–40rpx）、自绘选择面板替代系统弹窗、表单防呆（红框定位 + 错误提示）、一键拨号、游客可浏览。</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- 3 差距 -->
+    <section>
+      <h2><span class="num">3</span>与完整方案的差距　<span class="hint">按原方案分期口径归类</span></h2>
+      <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:190px">能力项</th><th style="width:96px">状态</th><th>说明与处理建议</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="name">提现与人工退款</td>
+            <td><span class="pill p-part">后端就绪</span></td>
+            <td>后端接口完整（申请 / 审核 / 驳回 / 标记打款、人工退款均含日志留痕），前端入口尚未开放。试点前补齐，否则互助员收益无法提现。</td>
+          </tr>
+          <tr>
+            <td class="name">待支付订单管理</td>
+            <td><span class="pill p-part">待补</span></td>
+            <td>下单中断会产生"待支付"订单，当前三端无入口查看与取消。需补页签或加超时自动作废。</td>
+          </tr>
+          <tr>
+            <td class="name">一键 SOS 紧急救助</td>
+            <td><span class="pill p-part">演示级</span></td>
+            <td>界面已成型，未接后端与通知通道。这是老人端信任感最强的功能，建议试点阶段做成"真实可用 + 人工值守"。</td>
+          </tr>
+          <tr>
+            <td class="name">健康档案与健康管理</td>
+            <td><span class="pill p-part">演示级</span></td>
+            <td>健康页为示例数据；陪诊健康评估已真实入库。老人档案（重点标签 / 风险等级 / 关爱周期）未建。</td>
+          </tr>
+          <tr>
+            <td class="name">信用积分体系</td>
+            <td><span class="pill p-none">二期</span></td>
+            <td>原方案中拒单扣分、信用分级、接单权限联动，一期未实现；当前以"审核制 + 并发上限 + 评价"作过渡约束。</td>
+          </tr>
+          <tr>
+            <td class="name">重点老人探访 / 关爱任务</td>
+            <td><span class="pill p-none">二期</span></td>
+            <td>原方案第二阶段能力，依赖老人档案与社区名单，建议随试点社区数据一并建设。</td>
+          </tr>
+          <tr>
+            <td class="name">智慧监管大屏</td>
+            <td><span class="pill p-none">二期</span></td>
+            <td>已有 H5 数据统计页作雏形（KPI + 趋势 + 分布）；完整大屏（老人分布、覆盖率、告警）待建，属对上汇报型功能。</td>
+          </tr>
+          <tr>
+            <td class="name">物联网 / 区块链存证</td>
+            <td><span class="pill p-none">二期</span></td>
+            <td>原方案第三阶段，涉及硬件采购与合规评估，不影响一期试点闭环。</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="font-size:12.5px;color:var(--muted);margin-top:11px;">
+        说明：二期项均为原方案既定分期，非遗漏。一期范围锁定在"日常互助闭环 + 陪诊 + 管理监管"，已全部交付。
+      </p>
+    </section>
+
+    <!-- 4 门槛 -->
+    <section>
+      <h2><span class="num">4</span>上线前的四道门槛　<span class="hint">技术已不是主要瓶颈</span></h2>
+      <div class="gate-grid">
+
+        <div class="gate hot">
+          <div class="gate-head">
+            <div class="gate-icon">A</div>
+            <h3>资金与支付合规</h3>
+            <div class="lvl">最高优先</div>
+          </div>
+          <ul>
+            <li>当前为<b>模拟支付</b>（下单即成功、无真实扣款），需申请微信支付商户号并接入 JSAPI 支付 V3 + 回调验签。</li>
+            <li><em>平台代收陪诊费再结算给互助员，存在"二清"风险</em>。需选择：服务商分账模式 / 互助员直收 / 灵活用工结算通道。这条决定商业模式，建议优先决策。</li>
+            <li>互助员人民币余额可提现，形成<b>平台资金池</b>，需明确资金存管与对账机制。</li>
+          </ul>
+        </div>
+
+        <div class="gate hot">
+          <div class="gate-head">
+            <div class="gate-icon">B</div>
+            <h3>资质与隐私合规</h3>
+            <div class="lvl">上线前置</div>
+          </div>
+          <ul>
+            <li>小程序类目与资质：养老服务、家政类需营业执照对应经营范围；<em>陪诊涉医疗周边，审核可能要求医疗相关资质</em>，建议提前与平台预审沟通。</li>
+            <li>隐私合规：需补《隐私政策》《用户协议》正文、个人信息收集清单；<b>健康评估数据属敏感个人信息，须单独同意</b>。</li>
+            <li>互助员身份核验：<b>实名认证与无犯罪记录核验</b>当前未接入，上门服务场景下属必要项。</li>
+          </ul>
+        </div>
+
+        <div class="gate">
+          <div class="gate-head">
+            <div class="gate-icon">C</div>
+            <h3>技术与运维</h3>
+            <div class="lvl">约 2–3 周</div>
+          </div>
+          <ul>
+            <li>登录验证码当前固定为 <b>123456</b>，需接真实短信服务并做频率限制。</li>
+            <li>部署方式为<b>本地电脑 + 临时内网穿透</b>，需迁移至云服务器 + 备案域名 + HTTPS。</li>
+            <li>图片存本地磁盘（151 张），需转<b>对象存储 + CDN</b>；数据库需定时备份、异地留存。</li>
+            <li>密钥与数据库口令目前写在配置文件中明文，需改环境变量 / 密钥管理；补监控告警与错误日志收集。</li>
+            <li>代码版本仅 5 次提交，<b>建议立即规范 Git 提交与远程仓库备份</b>，避免单点丢失。</li>
+          </ul>
+        </div>
+
+        <div class="gate">
+          <div class="gate-head">
+            <div class="gate-icon">D</div>
+            <h3>运营与风险兜底</h3>
+            <div class="lvl">非技术，决定成败</div>
+          </div>
+          <ul>
+            <li><b>互助员供给</b>：首批从哪来？建议依托社区 / 街道现有志愿者、网格员、退休医护转化。</li>
+            <li><b>保险</b>：上门服务责任险 + 互助员意外险，一本保单的成本远低于一次纠纷。</li>
+            <li><b>冷启动</b>：老人不会用手机，需社区工作人员代下单或家属端承接，建议配 1 名驻点运营。</li>
+            <li>服务纠纷处置流程与平台责任边界需书面明确（平台是信息撮合还是服务提供方）。</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5 路线 -->
+    <section>
+      <h2><span class="num">5</span>建议的上线路径　<span class="hint">先跑通一个社区，再谈规模</span></h2>
+      <div class="road">
+        <div class="step now">
+          <div class="step-head">
+            <h3>阶段一　演示验收</h3>
+            <div class="when">本周 · 已就绪</div>
+          </div>
+          <p>三端演示环境就绪，完整闭环可现场走通（发单 → 接单 → 打卡 → 确认 → 结算 → 评价），后台可实时查看数据。重点演示<b>时间币双轨结算</b>与<b>服务留痕</b>两个差异化能力。</p>
+        </div>
+        <div class="step">
+          <div class="step-head">
+            <h3>阶段二　单社区灰度试点</h3>
+            <div class="when">4–6 周</div>
+          </div>
+          <p>锁定 1 个社区，<b>20–30 位老人、6–10 位互助员</b>，真实跑单。此阶段补齐：提现与退款入口、待支付单管理、真实短信、云部署与 HTTPS、互助员实名核验、服务保险。<br>支付可先采用<b>线下结算或互助员直收</b>，绕开二清问题，把业务真实性验证放在第一位。</p>
+        </div>
+        <div class="step">
+          <div class="step-head">
+            <h3>阶段三　合规化正式运营</h3>
+            <div class="when">2–3 个月</div>
+          </div>
+          <p>完成支付分账方案落地、资质与隐私合规、SOS 接真实通道与值守、老人档案与重点关爱、信用积分体系，具备多社区复制条件。同步启动二期（探访任务、监管大屏）。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 决策 -->
+    <section>
+      <h2><span class="num">6</span>需要周总决策的三件事</h2>
+      <div class="decide">
+        <div class="dc">
+          <div class="n">01</div>
+          <div>
+            <h4>试点落在哪里，有没有社区 / 街道背书</h4>
+            <p>互助养老的核心壁垒不是系统，是<b>信任与供给</b>。有社区背书，互助员招募和老人信任成本都会降一个量级；若能对接政府购买服务或时间银行试点政策，还能解决一部分资金来源。</p>
+          </div>
+        </div>
+        <div class="dc">
+          <div class="n">02</div>
+          <div>
+            <h4>钱怎么走：平台代收，还是互助员直收</h4>
+            <p>平台代收体验最好，但需要<b>分账资质或第三方结算通道</b>，且形成资金池；互助员直收最快上线、合规成本最低，但抽佣与对账要另做设计。建议试点期先直收，验证需求后再升级代收 + 分账。</p>
+          </div>
+        </div>
+        <div class="dc">
+          <div class="n">03</div>
+          <div>
+            <h4>投入：运营人手 + 基础服务采购</h4>
+            <p>上线不是开发完就结束：需 <b>1 名驻点运营</b>（带老人用、盯订单、处理纠纷）、<b>云服务器与域名备案</b>、<b>短信服务</b>、<b>服务保险</b>。这几项合计投入不大，但缺一项都上不了线。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">
+      <div>本报告依据项目代码库、实现方案与内部体检记录综合评估生成 · 数据截至 2026-10-21</div>
+      <div>智慧互助养老平台 · 内部资料</div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>

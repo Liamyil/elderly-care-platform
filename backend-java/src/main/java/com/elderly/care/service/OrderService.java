@@ -387,6 +387,7 @@ public class OrderService {
     /**
      * 陪诊订单支付（一期模拟支付：pay_mock=1 支付即成功；真实微信支付接入后返回 JSAPI 支付参数）
      */
+    @Transactional
     public Result<Map<String, Object>> pay(Long uid, String orderId) {
         Order order = orderRepository.findById(orderId).orElse(null);
         if (order == null) {
@@ -411,6 +412,8 @@ public class OrderService {
         order.setStatus("待接单");
         order.setStatusKey("pending");
         orderRepository.save(order);
+        // 下单人消费流水：支付即记支出（rmbSpent 统计口径 = pay_status=paid，与明细完全对应；退款时删回）
+        fundService.insertRmbTx(uid, "expense", order.getType() + "-服务消费", order.getRmbAmount(), order.getId());
         insertMessage(uid, "order", "支付成功", "您的" + order.getType() + "订单支付成功（模拟支付），等待互助员接单", order.getId());
 
         Map<String, Object> data = new LinkedHashMap<>();

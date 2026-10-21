@@ -12,6 +12,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 启动初始化器（角色管理精细化）：
@@ -55,6 +57,7 @@ public class SuperAdminInitializer implements ApplicationRunner {
         ensureMessageColumns();
         Long superAdminId = ensureSuperAdmin();
         seedDefaultConfigs(superAdminId);
+        backfillRmbConsumeTransactions();
     }
 
     /** 幂等建表：3 张新表（utf8mb4 与现有表一致） */
@@ -251,5 +254,32 @@ public class SuperAdminInitializer implements ApplicationRunner {
         config.setUpdatedAt(LocalDateTime.now());
         configRepository.save(config);
         log.info("[初始化] 已写入默认配置 {} = {}", key, value);
+    }
+
+    /**
+     * 历史数据补账（幂等）：人民币已支付订单补下单人消费支出流水。
+     * 修复背景：旧版支付接口只置 pay_status=paid 不写支出流水，导致老人端「人民币消费账单」明细缺失
+     * （顶部 rmbSpent 从 orders 合计有数、流水表却无记录）。ID 沿用历史修复惯例 TXREPAIR-<订单号>。
+     */
+    private void backfillRmbConsumeTransactions() {
+        List<Map<String, Object>> orders = jdbcTemplate.queryForList(
+                "SELECT o.id, o.user_id, o.type, o.rmb_amount FROM orders o " +
+                "WHERE o.asset_type = 'rmb' AND o.pay_status = 'paid' AND o.rmb_amount IS NOT NULL AND o.rmb_amount > 0 " +
+                "AND NOT EXISTS (SELECT 1 FROM transactions t WHERE t.user_id = o.user_id AND t.order_id = o.id " +
+                "AND t.asset_type = 'rmb' AND t.type = 'expense')");
+        int inserted = 0;
+        for (Map<String, Object> row : orders) {
+            String orderId = String.valueOf(row.get("id"));
+            Long userId = ((Number) row.get("user_id")).longValue();
+            String orderType = String.valueOf(row.get("type"));
+            Object rmbAmount = row.get("rmb_amount");
+            jdbcTemplate.update("INSERT INTO transactions (id, user_id, type, name, amount, asset_type, rmb_amount, order_id) " +
+                            "VALUES (?, ?, 'expense', ?, 0, 'rmb', ?, ?)",
+                    "TXREPAIR-" + orderId, userId, orderType + "-服务消费", rmbAmount, orderId);
+            inserted++;
+        }
+        if (inserted > 0) {
+            log.info("[初始化] 人民币消费流水补账完成：为 {} 笔已支付订单补写支出流水", inserted);
+        }
     }
 }

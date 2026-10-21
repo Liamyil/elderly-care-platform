@@ -37,9 +37,9 @@
       <text class="stat-label">时间币</text>
     </view>
     <view class="stat-divider"></view>
-    <view class="stat-item">
+    <view class="stat-item" bindtap="goToRmbBill">
       <text class="stat-value">{{userInfo.rmbSpent}}</text>
-      <text class="stat-label">人民币消费(元)</text>
+      <text class="stat-label">人民币消费(元) ›</text>
     </view>
     <view class="stat-divider"></view>
     <view class="stat-item">

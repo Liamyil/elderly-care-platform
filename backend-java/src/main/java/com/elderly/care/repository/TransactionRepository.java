@@ -21,6 +21,11 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     int renameFreezeToSettled(@Param("orderId") String orderId, @Param("uid") Long uid,
                               @Param("oldName") String oldName, @Param("newName") String newName);
 
+    /** 人民币订单退款：删除下单人的支付支出流水（消费明细与 rmbSpent 口径一致：已退款不计消费） */
+    @Modifying
+    @Query("delete from Transaction t where t.orderId = :orderId and t.userId = :uid and t.assetType = 'rmb' and t.type = 'expense'")
+    int deletePayerRmbExpense(@Param("orderId") String orderId, @Param("uid") Long uid);
+
     @Query("select coalesce(sum(t.amount), 0) from Transaction t where t.userId = :uid and t.type = :type")
     Long sumAmountByUserIdAndType(@Param("uid") Long uid, @Param("type") String type);
 

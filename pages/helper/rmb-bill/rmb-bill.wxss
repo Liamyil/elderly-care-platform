@@ -234,6 +234,19 @@
   color: #E64340;
 }
 
+/* ===== 明细点击跳转订单：有关联订单的行加右侧箭头与按压反馈 ===== */
+
+.transaction-arrow {
+  font-size: 40rpx;
+  color: #C0C0C0;
+  margin-left: 12rpx;
+  flex-shrink: 0;
+}
+
+.transaction-item-hover {
+  background-color: #F7F8FA;
+}
+
 .empty-state {
   padding: 60rpx 0;
   text-align: center;

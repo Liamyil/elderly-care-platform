@@ -3,20 +3,27 @@
     <view class="nav-left" bindtap="goBack">
       <text class="nav-back-icon">‹</text>
     </view>
-    <text class="nav-title">人民币账单</text>
+    <text class="nav-title">{{viewMode === 'consume' ? '人民币消费账单' : '人民币账单'}}</text>
     <view class="nav-right"></view>
   </view>
 
   <view class="nav-content">
     <view class="overview-card">
-      <view class="balance-section">
+      <view wx:if="{{viewMode !== 'consume'}}" class="balance-section">
         <text class="balance-label">当前人民币余额(元)</text>
         <view class="balance-value">
           <text class="balance-num">{{rmbBalance}}</text>
           <text class="balance-unit">元</text>
         </view>
       </view>
-      <view class="stats-row">
+      <view wx:else class="balance-section">
+        <text class="balance-label">累计人民币消费(元)</text>
+        <view class="balance-value">
+          <text class="balance-num">{{consumeTotal}}</text>
+          <text class="balance-unit">元</text>
+        </view>
+      </view>
+      <view wx:if="{{viewMode !== 'consume'}}" class="stats-row">
         <view class="stat-item">
           <text class="stat-value income">+{{totalIncome}}元</text>
           <text class="stat-label">累计收入</text>
@@ -31,14 +38,17 @@
 
     <view class="recent-section">
       <view class="section-header">
-        <text class="section-title">收支明细</text>
-        <text class="section-more">仅展示人民币流水</text>
+        <text class="section-title">{{viewMode === 'consume' ? '消费明细' : '收支明细'}}</text>
+        <text class="section-more">{{viewMode === 'consume' ? '陪诊等服务的人民币支出' : '仅展示人民币流水'}}</text>
       </view>
       <view class="transaction-list">
         <view
           wx:for="{{transactions}}"
           wx:key="id"
           class="transaction-item"
+          bindtap="goOrderDetail"
+          data-order-id="{{item.orderId}}"
+          hover-class="{{item.orderId ? 'transaction-item-hover' : 'none'}}"
         >
           <view class="transaction-icon {{item.type}}">
             <text class="icon-text">{{item.type === 'income' ? '+' : '-'}}</text>
@@ -48,10 +58,11 @@
             <text class="transaction-time">{{item.time}}</text>
           </view>
           <text class="transaction-amount {{item.type}}">{{item.displayAmount}}</text>
+          <text wx:if="{{item.orderId}}" class="transaction-arrow">›</text>
         </view>
       </view>
       <view wx:if="{{transactions.length === 0}}" class="empty-state">
-        <text class="empty-text">暂无人民币流水</text>
+        <text class="empty-text">{{viewMode === 'consume' ? '暂无人民币消费记录' : '暂无人民币流水'}}</text>
       </view>
     </view>
   </view>

@@ -75,6 +75,8 @@ public class OrderFundService {
             // 退款完成后冻结数清零（hasFrozenFunds 与后台展示不再误报冻结中）
             order.setFrozenCoins(0);
         } else if (ASSET_RMB.equals(order.getAssetType()) && PAY_PAID.equals(order.getPayStatus())) {
+            // 删除下单人的支付支出流水（rmbSpent 口径不计已退款订单，明细同步删除，顶部与明细永远对齐）
+            transactionRepository.deletePayerRmbExpense(order.getId(), order.getUserId());
             order.setPayStatus(PAY_REFUNDED);
             order.setRefunded(1);
         }

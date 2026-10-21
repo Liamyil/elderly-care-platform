@@ -150,6 +150,13 @@ Page({
     })
   },
 
+  /** 人民币消费明细：复用互助员端账单页，view=consume 进入消费视图（只展示作为下单人的支出流水） */
+  goToRmbBill() {
+    wx.navigateTo({
+      url: '/pages/helper/rmb-bill/rmb-bill?view=consume'
+    })
+  },
+
   goToHelpers() {
     wx.showToast({
       title: '互助员列表功能开发中',

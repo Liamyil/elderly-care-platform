@@ -20,10 +20,7 @@ App({
     }
 
     console.log('=== App onLaunch ===')
-
-    // 站内信闭环：记录会话启动时间，悬浮横幅只弹此时间之后产生的新消息（历史未读只走铃铛红点）
-    this._messageSessionStart = Date.now()
-    console.log('[msg-poll] 会话启动时间(ms) =', this._messageSessionStart, '=>', new Date(this._messageSessionStart).toLocaleString())
+    // 站内信闭环：登录时间锁在 startMessagePolling 中按 token 变化自动重置（历史未读只亮红点不弹悬浮窗）
   },
   
   onShow() {
@@ -185,7 +182,7 @@ App({
 
   // ===== 站内信闭环 · 全局悬浮横幅（5 秒轮询最新未读，测试期；稳定后可回调 15 秒） =====
   // 性能闸门：仅登录后 + 仅前台（onShow 启 / onHide 停）；请求为轻量静默接口（latest-unread 最多 3 条）；
-  // 排查结论落地：时间锁过滤已移除，仅保留同一消息 ID 去重；轮询响应同步驱动首页铃铛红点。
+  // 过滤策略：登录时间锁（早于本次登录产生的历史未读只亮红点不弹窗）+ 同一消息 ID 去重；轮询响应同步驱动首页铃铛红点。
 
   /** 启动消息轮询（app.onShow 与登录弹窗登录成功后调用；未登录直接返回） */
   startMessagePolling: function() {
@@ -194,6 +191,13 @@ App({
     if (!token) return
     this.stopMessagePolling()
     if (!this._shownMessageIds) this._shownMessageIds = {}
+    // 登录时间锁：token 变化（登录/换号）视为新会话并重置时间锁——此前产生的历史未读只亮红点不弹悬浮窗；
+    // onShow 同 token 不重置（后台期间新到的消息回到前台仍会弹）
+    if (this._pollToken !== token) {
+      this._pollToken = token
+      this._messageLoginTime = Date.now()
+      console.log('[msg-poll] 检测到新登录会话, 时间锁重置为', new Date(this._messageLoginTime).toLocaleTimeString())
+    }
     var self = this
     this._messagePollTimer = setInterval(function () { self.pollLatestUnread() }, 5000)
     console.log('[msg-poll] 定时器已启动, timerId =', this._messagePollTimer)
@@ -237,7 +241,12 @@ App({
       }
       for (var i = 0; i < list.length; i++) {
         var msg = list[i]
-        // 仅保留 ID 去重（同一条消息只弹一次）；时间锁过滤已按排查要求移除
+        // 登录时间锁：早于本次登录产生的历史未读只亮红点（updateUnreadBadge 已按列表亮起），不弹悬浮窗
+        if (self._messageLoginTime && typeof msg.ts === 'number' && msg.ts < self._messageLoginTime) {
+          console.log('[msg-poll] 跳过历史消息', msg.id, '「' + msg.title + '」, 原因: 早于本次登录时间（只亮红点不弹窗）')
+          continue
+        }
+        // 仅保留 ID 去重（同一条消息只弹一次）
         if (self._shownMessageIds[msg.id]) {
           console.log('[msg-poll] 跳过消息', msg.id, '「' + msg.title + '」, 原因: 该消息 ID 已弹过（去重命中）')
           continue

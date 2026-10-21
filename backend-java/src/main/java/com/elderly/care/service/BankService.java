@@ -68,6 +68,8 @@ public class BankService {
             row.put("amount", t.getAmount());
             row.put("assetType", t.getAssetType() == null ? "time_coin" : t.getAssetType());
             row.put("rmbAmount", t.getRmbAmount());
+            // 关联订单号：账单明细点击跳转对应订单详情（提现等无订单流水为空）
+            row.put("orderId", t.getOrderId());
             row.put("time", t.getCreatedAt() == null ? "" : t.getCreatedAt().format(TIME_FORMAT));
             rows.add(row);
         }
